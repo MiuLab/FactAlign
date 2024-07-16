@@ -1,17 +1,19 @@
 # Model arguments
 # model_name_or_path: Columbia-NLP/gemma-2b-zephyr-sft
-model_name_or_path: experiments/gemma-2b-zephyr-sft/kto-mix-14k-lf-response-f1_0.75-fg
+# model_name_or_path: experiments/gemma-2b-zephyr-sft/lf-response-f164_0.75
+model_name_or_path: microsoft/Phi-3-mini-4k-instruct
 torch_dtype: float16
 
 # Data training arguments
 # For definitions, see: src/h4/training/config.py
 dataset_mixer:
-  trl-lib/kto-mix-14k: 0.2
-  # chaoweihuang/lf-response-f1_0.75: 1.0
+  trl-lib/kto-mix-14k: 1.0
+  chaoweihuang/lf-response-f1_0.75-dedup: 1.0
+  # chaoweihuang/lf-response-f164_0.75-fg1.0-rep-dedup: 1.0
   # chaoweihuang/lf-response-f1_0.75-iter2: 1.0
   # chaoweihuang/lf-response-f1_0.75-fg-calibration_r5pct: 1.0
-  chaoweihuang/lf-response-f1_0.75-fg-calibration_gt: 1.0
-  # chaoweihuang/lf-response-repetitions: 1.0
+  # chaoweihuang/lf-response-f1_0.75-fg-calibration_gt: 1.0
+  chaoweihuang/lf-response-repetitions: 1.0
   # chaoweihuang/lf-response-calibration_r10pct-nofg: 1.0
   # chaoweihuang/lf-response-precision_0.8: 1.0
 dataset_splits:
@@ -41,9 +43,10 @@ max_length: 1200
 max_prompt_length: 512
 num_train_epochs: 1.0
 optim: adamw_8bit
-# output_dir: experiments/gemma-2b-zephyr-sft/lf-response-f1_0.75-kto
-output_dir: experiments/gemma-2b-zephyr-sft/kto-mix-14k-lf-response-f1_0.75-fg-calibration_gt
+# output_dir: experiments/gemma-2b-zephyr-sft/kto-mix-14k-lf-response-f1_0.75-dedup-kto-rep
+# output_dir: experiments/gemma-2b-zephyr-sft/kto-mix-14k-lf-response-f1_0.75-fg-calibration_gt
 # output_dir: experiments/gemma-2b-zephyr-sft/kto-mix-14k-lf-response-f1_0.75-calibration_r10pct_nofg-fg
+output_dir: experiments/Phi-3-mini-4k-instruct/kto-mix-14k-lf-response-f1_0.75-dedup-rep-kto
 gradient_accumulation_steps: 8
 per_device_train_batch_size: 1
 per_device_eval_batch_size: 1
