@@ -25,5 +25,15 @@ NUM_GPUS=2
 #     --fp16 \
 #     --logging_first_step
 
+
 ACCELERATE_LOG_LEVEL=info accelerate launch --config_file configs/deepspeed_zero3.yaml --num_processes ${NUM_GPUS} \
     run_kto.py configs/kto_deepspeed.yaml
+
+ACCELERATE_LOG_LEVEL=info accelerate launch --config_file configs/deepspeed_zero3.yaml --num_processes ${NUM_GPUS} \
+    run_kto.py configs/kto_deepspeed_2.yaml
+
+ACCELERATE_LOG_LEVEL=info accelerate launch --config_file configs/deepspeed_zero3.yaml --num_processes ${NUM_GPUS} \
+    run_kto.py configs/kto_deepspeed_3.yaml
+
+ACCELERATE_LOG_LEVEL=info accelerate launch --config_file configs/deepspeed_zero3.yaml --num_processes ${NUM_GPUS} \
+    run_kto.py configs/kto_deepspeed_4.yaml

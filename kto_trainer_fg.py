@@ -780,13 +780,14 @@ class FGKTOTrainer(Trainer):
             fn_kwargs={"tokenizer": self.tokenizer, "embedding_tokenizer": self.embedding_tokenizer},
             batched=True,
             desc=f"Tokenizing {split} dataset",
+            load_from_cache_file=False,
         )
 
         # Get KL datasets
         # create pairs for estimating the KL term by flipping the matched pairs in each batch of size total_batch_size
         # i.e., (x_1, y_1), ..., (x_n, y_n) --> (x_1, y_n), ..., (x_n, y_1) = (x'_1, y'_1), ..., (x'_n, y'_n)
         kl_dataset = dataset.map(
-            _get_kl_dataset, batched=True, batch_size=total_batch_size, desc=f"Extracting KL {split} dataset"
+            _get_kl_dataset, batched=True, batch_size=total_batch_size, desc=f"Extracting KL {split} dataset", load_from_cache_file=False
         )
         # Prepare the datasets
         fn_kwargs = {
@@ -804,6 +805,7 @@ class FGKTOTrainer(Trainer):
             fn_kwargs=fn_kwargs,
             num_proc=args.dataset_num_proc,
             desc=f"Processing tokenized {split} dataset",
+            load_from_cache_file=False,
         )
         fn_kwargs["prefix"] = "KL_"
         kl_dataset = kl_dataset.map(
@@ -812,6 +814,7 @@ class FGKTOTrainer(Trainer):
             num_proc=args.dataset_num_proc,
             remove_columns=[c for c in kl_dataset.column_names if c in dataset.column_names],
             desc=f"Processing tokenized {split} KL dataset",
+            load_from_cache_file=False,
         )
 
         # merge the datasets

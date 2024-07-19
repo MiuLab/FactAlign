@@ -25,7 +25,6 @@ from alignment import (
     DataArguments,
     H4ArgumentParser,
     ModelArguments,
-    apply_chat_template,
     get_checkpoint,
     get_datasets,
     get_kbit_device_map,
@@ -34,6 +33,7 @@ from alignment import (
     get_tokenizer,
     is_adapter_model,
 )
+from alignment.data import is_openai_format
 from peft import PeftConfig, PeftModel
 from trl import setup_chat_format
 
@@ -41,6 +41,27 @@ from kto_trainer_fg import FGKTOConfig, FGKTOTrainer
 
 
 logger = logging.getLogger(__name__)
+
+
+def apply_chat_template(
+    example,
+    tokenizer,
+    auto_insert_empty_system_msg: bool = True,
+):
+    if all(k in example.keys() for k in ("prompt", "completion", "label")):
+        if not is_openai_format(example["prompt"]) or not is_openai_format(example["completion"]):
+            raise ValueError(
+                f"Could not format example as dialogue for `kto` task! Require OpenAI format for all messages"
+            )
+        example["prompt"] = tokenizer.apply_chat_template(example["prompt"], tokenize=False)
+        example["completion"] = tokenizer.apply_chat_template(example["completion"], tokenize=False)
+    else:
+        raise ValueError(
+            f"Could not format example as dialogue for `kto` task! Requires the keys `[prompt, completion, label]`"
+            f" but found {list(example.keys())} instead."
+        )
+
+    return example
 
 
 def main():
@@ -139,6 +160,10 @@ def main():
     if "<|im_start|>" in tokenizer.chat_template:
         model, tokenizer = setup_chat_format(model, tokenizer)
 
+    # For Phi-3 tokenizer, we need to remove the eos_token from the chat template
+    if tokenizer.chat_template == "{% for message in messages %}{% if message['role'] == 'system' %}{{'<|system|>\n' + message['content'] + '<|end|>\n'}}{% elif message['role'] == 'user' %}{{'<|user|>\n' + message['content'] + '<|end|>\n'}}{% elif message['role'] == 'assistant' %}{{'<|assistant|>\n' + message['content'] + '<|end|>\n'}}{% endif %}{% endfor %}{% if add_generation_prompt %}{{ '<|assistant|>\n' }}{% else %}{{ eos_token }}{% endif %}":
+        tokenizer.chat_template = "{% for message in messages %}{% if message['role'] == 'system' %}{{'<|system|>\n' + message['content'] + '<|end|>\n'}}{% elif message['role'] == 'user' %}{{'<|user|>\n' + message['content'] + '<|end|>\n'}}{% elif message['role'] == 'assistant' %}{{'<|assistant|>\n' + message['content'] + '<|end|>\n'}}{% endif %}{% endfor %}{% if add_generation_prompt %}{{ '<|assistant|>\n' }}{% endif %}"
+
     #####################
     # Apply chat template
     #####################
@@ -146,11 +171,11 @@ def main():
         apply_chat_template,
         fn_kwargs={
             "tokenizer": tokenizer,
-            "task": "kto",
             "auto_insert_empty_system_msg": data_args.auto_insert_empty_system_msg,
         },
         num_proc=data_args.preprocessing_num_workers,
         desc="Formatting prompt-completion pairs with prompt template",
+        load_from_cache_file=False,
     )
 
     ##########################
