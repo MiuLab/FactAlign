@@ -1353,7 +1353,7 @@ class FGKTOTrainer(Trainer):
         )
 
         fg_kl = (policy_fg_KL_logps - reference_fg_KL_logps).mean().detach()
-        fg_kl = self.accelerator.gather(fg_kl).mean().clamp(min=0)
+        fg_kl = self.accelerator.gather(fg_kl).nanmean().clamp(min=0)
 
         if policy_fg_chosen_logps.shape[0] != 0 or reference_fg_chosen_logps.shape[0] != 0:
             fg_chosen_logratios = policy_fg_chosen_logps - reference_fg_chosen_logps
@@ -1621,19 +1621,31 @@ class FGKTOTrainer(Trainer):
         metrics["kl"] = kl.item()
 
         if self.loss_type == "fg_kto":
-            if not fg_losses.nanmean().isnan():
-                metrics["fg_kl"] = fg_kl.item()
-                metrics["fg_loss"] = fg_losses.nanmean().item()
-                metrics["fg_logps/policy_chosen"] = self.accelerator.gather(policy_fg_chosen_logps.nanmean()).nanmean().item()
-                metrics["fg_logps/policy_rejected"] = self.accelerator.gather(policy_fg_rejected_logps.nanmean()).nanmean().item()
-                metrics["fg_logps/policy_KL"] = self.accelerator.gather(policy_fg_KL_logps.nanmean()).nanmean().item()
-                metrics["fg_logps/reference_chosen"] = self.accelerator.gather(reference_fg_chosen_logps.nanmean()).nanmean().item()
-                metrics["fg_logps/reference_rejected"] = self.accelerator.gather(reference_fg_rejected_logps.nanmean()).nanmean().item()
-                metrics["fg_logps/reference_KL"] = self.accelerator.gather(reference_fg_KL_logps.nanmean()).nanmean().item()
-                metrics["count/fg_chosen"] = len(fg_chosen_rewards)
-                metrics["count/fg_rejected"] = len(fg_rejected_rewards)
+            num_fg_chosen = torch.Tensor([len(fg_chosen_rewards)]).to(self.accelerator.device)
+            num_fg_rejected = torch.Tensor([len(fg_rejected_rewards)]).to(self.accelerator.device)
+
+            all_num_fg_chosen = self.accelerator.gather(num_fg_chosen).sum().item()
+            all_num_fg_rejected = self.accelerator.gather(num_fg_rejected).sum().item()
+
+            if all_num_fg_chosen > 0:
                 metrics["fg_rewards/chosen_sum"] = self.accelerator.gather(fg_chosen_rewards.nansum()).nansum().item()
+                metrics["fg_logps/policy_chosen"] = self.accelerator.gather(policy_fg_chosen_logps.nanmean()).nanmean().item()
+                metrics["fg_logps/reference_chosen"] = self.accelerator.gather(reference_fg_chosen_logps.nanmean()).nanmean().item()
+                metrics["count/fg_chosen"] = all_num_fg_chosen
+            
+            if all_num_fg_rejected > 0:
                 metrics["fg_rewards/rejected_sum"] = self.accelerator.gather(fg_rejected_rewards.nansum()).nansum().item()
+                metrics["fg_logps/policy_rejected"] = self.accelerator.gather(policy_fg_rejected_logps.nanmean()).nanmean().item()
+                metrics["fg_logps/reference_rejected"] = self.accelerator.gather(reference_fg_rejected_logps.nanmean()).nanmean().item()
+                metrics["count/fg_rejected"] = all_num_fg_rejected
+
+            if all_num_fg_chosen > 0 or all_num_fg_rejected > 0:
+                metrics["fg_logps/policy_KL"] = self.accelerator.gather(policy_fg_KL_logps.nanmean()).nanmean().item()
+                metrics["fg_logps/reference_KL"] = self.accelerator.gather(reference_fg_KL_logps.nanmean()).nanmean().item()
+
+            metrics["fg_kl"] = fg_kl.item()
+            if not fg_losses.nanmean().isnan():
+                metrics["fg_loss"] = fg_losses.nanmean().item()
                 loss = self.loss_weight * losses.nanmean() + self.fg_loss_weight * fg_losses.nanmean()
             else:
                 loss = losses.nanmean()
