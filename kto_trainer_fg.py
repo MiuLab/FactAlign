@@ -358,6 +358,10 @@ class FGKTOConfig(KTOConfig):
     """The weight of the fine-grained loss in the total loss."""
     fg_beta: float = 0.1
     """The beta factor in fine-grained KTO loss. Higher beta means less divergence from the initial policy."""
+    fg_desirable_weight: float = 1.0
+    """The fine-grained desirable losses are weighed by this factor."""
+    fg_undesirable_weight: float = 1.0
+    """The fine-grained undesirable losses are weighed by this factor."""
 
 
 class FGKTOTrainer(Trainer):
@@ -635,6 +639,8 @@ class FGKTOTrainer(Trainer):
         self.loss_weight = args.loss_weight
         self.fg_loss_weight = args.fg_loss_weight
         self.fg_beta = args.fg_beta
+        self.fg_desirable_weight = args.fg_desirable_weight
+        self.fg_undesirable_weight = args.fg_undesirable_weight
 
         self.loss_type = args.loss_type
         # Underlying Distribution Matching argument
@@ -1021,21 +1027,51 @@ class FGKTOTrainer(Trainer):
         data_loader = self.accelerator.prepare(DataLoader(dataset, **dataloader_params))
 
         reference_completion_logps = []
+        reference_completion_sentence_logps = []
         reference_KL_logps = []
+        reference_sentence_KL_logps = []
 
         for padded_batch in tqdm(iterable=data_loader, desc=f"Precomputing {split} dataset reference log probs"):
-            reference_completion_logp, reference_KL_logp = self.compute_reference_log_probs(padded_batch)
+            reference_completion_logp_, reference_completion_sentence_logp_, reference_KL_logp_, reference_sentence_KL_logp_ = self.compute_reference_log_probs(padded_batch)
 
-            reference_completion_logp = self.accelerator.gather_for_metrics(reference_completion_logp)
+            reference_completion_logp = self.accelerator.gather_for_metrics(reference_completion_logp_)
             reference_completion_logps.append(reference_completion_logp.cpu())
 
-            reference_KL_logp = self.accelerator.gather_for_metrics(reference_KL_logp)
+            reference_completion_sentence_logp = self.accelerator.gather_for_metrics(reference_completion_sentence_logp_, use_gather_object=True)
+            reference_completion_sentence_logps.extend(
+                [
+                    np.stack([
+                        sentence_logp.cpu().float().numpy()
+                        for sentence_logp in sentence_logps
+                    ])
+                    for sentence_logps in reference_completion_sentence_logp
+                ]
+            )
+
+            reference_KL_logp = self.accelerator.gather_for_metrics(reference_KL_logp_)
             reference_KL_logps.append(reference_KL_logp.cpu())
+
+            reference_sentence_KL_logp = self.accelerator.gather_for_metrics(reference_sentence_KL_logp_, use_gather_object=True)
+            reference_sentence_KL_logps.extend(
+                [
+                    np.stack([
+                        sentence_KL_logp.cpu().float().numpy()
+                        for sentence_KL_logp in sentence_KL_logps
+                    ])
+                    for sentence_KL_logps in reference_sentence_KL_logp
+                ]
+            )
 
         dataset = dataset.add_column(
             name="reference_logps", column=torch.cat(reference_completion_logps).float().numpy()
         )
         dataset = dataset.add_column(name="reference_KL_logps", column=torch.cat(reference_KL_logps).float().numpy())
+
+        column = Dataset.from_dict({"reference_sentence_logps": reference_completion_sentence_logps})
+        dataset = concatenate_datasets([dataset, column], axis=1)
+
+        column = Dataset.from_dict({"reference_sentence_KL_logps": reference_sentence_KL_logps})
+        dataset = concatenate_datasets([dataset, column], axis=1)
 
         return dataset
 
@@ -1338,7 +1374,7 @@ class FGKTOTrainer(Trainer):
             fg_rejected_rewards = torch.Tensor([]).to(self.accelerator.device)
 
         fg_losses = torch.cat(
-            (self.desirable_weight * fg_chosen_losses, self.undesirable_weight * fg_rejected_losses),
+            (self.fg_desirable_weight * fg_chosen_losses, self.fg_undesirable_weight * fg_rejected_losses),
             0,
         )
 
@@ -1484,6 +1520,25 @@ class FGKTOTrainer(Trainer):
             reference_chosen_logps = batch["reference_logps"][chosen_idx, ...]
             reference_rejected_logps = batch["reference_logps"][rejected_idx, ...]
             reference_KL_logps = batch["reference_KL_logps"]
+            reference_fg_chosen_logps = []
+            reference_fg_rejected_logps = []
+            reference_fg_KL_logps = []
+            if "reference_sentence_logps" in batch:
+                for i, sentence_logps in enumerate(batch["reference_sentence_logps"]):
+                    for j, logp in enumerate(sentence_logps):
+                        if batch["sentence_label"][i][j]:
+                            reference_fg_chosen_logps.append(logp)
+                        else:
+                            reference_fg_rejected_logps.append(logp)
+
+            if "reference_sentence_KL_logps" in batch:
+                for i, sentence_logps in enumerate(batch["reference_sentence_KL_logps"]):
+                    for j, logp in enumerate(sentence_logps):
+                        reference_fg_KL_logps.append(logp)
+
+            reference_fg_chosen_logps = torch.stack(reference_fg_chosen_logps).to(self.accelerator.device) if reference_fg_chosen_logps else torch.Tensor([]).to(self.accelerator.device)
+            reference_fg_rejected_logps = torch.stack(reference_fg_rejected_logps).to(self.accelerator.device) if reference_fg_rejected_logps else torch.Tensor([]).to(self.accelerator.device)
+            reference_fg_KL_logps = torch.stack(reference_fg_KL_logps).to(self.accelerator.device) if reference_fg_KL_logps else torch.Tensor([]).to(self.accelerator.device)
         else:
             with torch.no_grad():
                 if self.ref_model is None:
