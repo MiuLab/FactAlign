@@ -67,6 +67,46 @@ We used DeepSpeed Zero2 to train `gemma-2b` and `Phi3-Mini` models on 2xV100 32G
 
 The `configs/kto_*deepspeed.yaml` files are the configurations for training the FactAlign model. You can adjust the hyperparameters in these files.
 
+### fKTO Trainer
+`kto_trainer_fg.py` contains the implementation of the fKTO trainer. The `FGKTOTrainer` class extends the `KTOTrainer` class from the `trl` package.
+
+### Dataset Format
+The dataset for training the FactAlign model with fine-grained factuality assessment should be in the following format:
+
+```json
+{
+    "prompt": [
+        {
+            "content": "What is the geographical importance of the Strait of Gibraltar? Provide as many specific details and examples as possible (such as names of people, numbers, events, locations, dates, times, etc.)",
+            "role": "user"
+        }
+    ],
+    "completion": [
+        {
+            "content": "The Strait of Gibraltar is a vital waterway that connects the Atlantic Ocean to the Mediterranean Sea, separating the Iberian Peninsula from the African continent...", 
+            "role": "assistant"
+        }
+    ],
+    "label": True,
+    "completion_sentences": [
+        "The Strait of Gibraltar is a vital waterway...",
+        "Its geographical importance is multifaceted...",
+        "The Strait of Gibraltar is approximately 14 kilometers...",
+        "It is situated at the westernmost point..."
+    ],
+    "sentence_label": [
+        true,
+        true,
+        true,
+        false
+    ]
+}
+```
+where `label` is the factuality assessment of the whole completion, `completion_sentences` are the sentences in the completion, and `sentence_label` is the factuality assessment of each sentence.
+
+You can find the prepared datasets in our [Huggingface collection](https://huggingface.co/collections/chaoweihuang/factalign-66fe175ff44983580bff96e0).
+
+
 ### Training the FactAlign Model
 To train the FactAlign model, run the following command:
 
