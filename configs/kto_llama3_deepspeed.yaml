@@ -1,0 +1,55 @@
+# Model arguments
+model_name_or_path: meta-llama/Meta-Llama-3-8B-Instruct
+torch_dtype: bfloat16
+
+# Data training arguments
+# For definitions, see: src/h4/training/config.py
+dataset_mixer:
+  trl-lib/kto-mix-14k: 1.0
+  chaoweihuang/lf-response-llama3-iter2-f1_100_0.8-fg0.5: 1.0
+  # chaoweihuang/lf-response-llama3-precision_0.75-fg0.5: 1.0
+  # chaoweihuang/lf-response-llama3-conformity: 1.0
+  # chaoweihuang/lf-response-f164_0.75-fg1.0-rep-dedup: 1.0
+  # chaoweihuang/lf-response-f1_0.75-iter2: 1.0
+dataset_splits:
+- train
+- test
+preprocessing_num_workers: 12
+
+# DPOTrainer arguments
+# fp16: true
+bf16: true
+beta: 0.1
+desirable_weight: 1.0
+loss_type: fg_kto
+loss_weight: 1.0
+fg_loss_weight: 1.0
+fg_beta: 0.1
+fg_desirable_weight: 1.0
+fg_undesirable_weight: 4.0
+do_eval: true
+evaluation_strategy: steps
+eval_steps: 400
+gradient_checkpointing: true
+gradient_checkpointing_kwargs:
+  use_reentrant: False
+learning_rate: 5.0e-7
+log_level: info
+logging_steps: 10
+lr_scheduler_type: linear
+max_length: 1200
+max_prompt_length: 512
+num_train_epochs: 1.0
+optim: adamw_8bit
+output_dir: experiments/Meta-Llama-3-8B-Instruct/kto-mix-14k-lf-response-llama3-iter2-f1_100_0.8-fg0.5-fgudw4.0-kto-fg
+gradient_accumulation_steps: 4
+per_device_train_batch_size: 1
+per_device_eval_batch_size: 1
+push_to_hub: false
+report_to:
+- tensorboard
+- wandb
+save_strategy: "no"
+save_only_model: true
+seed: 42
+warmup_ratio: 0.1
