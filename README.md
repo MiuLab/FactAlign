@@ -87,7 +87,7 @@ The dataset for training the FactAlign model with fine-grained factuality assess
             "role": "assistant"
         }
     ],
-    "label": True,
+    "label": true,
     "completion_sentences": [
         "The Strait of Gibraltar is a vital waterway...",
         "Its geographical importance is multifaceted...",
