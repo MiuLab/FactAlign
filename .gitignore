@@ -1,0 +1,9 @@
+.env
+.envrc
+submodules/
+.vscode/
+__pycache__/**
+cache/
+long-form-factuality/data/
+long-form-factuality/datasets/atlas
+results

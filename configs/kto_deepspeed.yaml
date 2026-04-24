@@ -21,29 +21,37 @@ loss_type: fg_kto
 loss_weight: 1.0
 fg_loss_weight: 1.0
 fg_beta: 0.1
+
+# Evaluation & Logging
 do_eval: true
 evaluation_strategy: steps
 eval_steps: 200
-gradient_checkpointing: true
-gradient_checkpointing_kwargs:
-  use_reentrant: False
-learning_rate: 5.0e-7
-log_level: info
 logging_steps: 10
-lr_scheduler_type: linear
-max_length: 1200
-max_prompt_length: 512
-num_train_epochs: 3.0
-optim: adamw_8bit
-output_dir: experiments/Phi-3-mini-4k-instruct/kto-mix-14k-lf-response-phi3-f1_100_0.75-fg1.0-kto-fg
-gradient_accumulation_steps: 8
-per_device_train_batch_size: 1
-per_device_eval_batch_size: 1
-push_to_hub: false
+log_level: info
 report_to:
 - tensorboard
 - wandb
+
+# Optimization Hyperparameters
+learning_rate: 5.0e-7
+lr_scheduler_type: linear
+warmup_ratio: 0.1
+num_train_epochs: 3.0
+optim: adamw_8bit
+max_length: 1200
+max_prompt_length: 512
+
+# Memory & Throughput
+gradient_checkpointing: true
+gradient_checkpointing_kwargs:
+  use_reentrant: False
+per_device_train_batch_size: 1
+per_device_eval_batch_size: 1
+gradient_accumulation_steps: 8
+
+# Output
+output_dir: experiments/Phi-3-mini-4k-instruct/kto-mix-14k-lf-response-phi3-f1_100_0.75-fg1.0-kto-fg
 save_strategy: "no"
 save_only_model: true
+push_to_hub: false
 seed: 42
-warmup_ratio: 0.1
