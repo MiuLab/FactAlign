@@ -8,22 +8,24 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 load_dotenv()
 
-model_id = "google/gemma-2b"
+model_id = "google/gemma-2b-it"
+# model_id = "meta-llama/Meta-Llama-3-8B"
+# model_id = "meta-llama/Llama-3.1-8B-Instruct"
 
 tokenizer = AutoTokenizer.from_pretrained(model_id)
 # Base models do not have a chat template by default, so we apply the standard Gemma template
-tokenizer.chat_template = (
-    "{{ bos_token }}"
-    "{% if messages[0]['role'] == 'system' %}{{ raise_exception('System role not supported') }}{% endif %}"
-    "{% for message in messages %}"
-    "{% if (message['role'] == 'user') != (loop.index0 % 2 == 0) %}{{ raise_exception('Conversation roles must alternate user/assistant/user/assistant/...') }}{% endif %}"
-    "{% if (message['role'] == 'assistant') %}{% set role = 'model' %}{% else %}{% set role = message['role'] %}{% endif %}"
-    "{{ '<start_of_turn>' + role + '\\n' + message['content'] | trim + '<end_of_turn>\\n' }}"
-    "{% endfor %}"
-    "{% if add_generation_prompt %}{{'<start_of_turn>model\\n'}}{% endif %}"
-)
+# tokenizer.chat_template = (
+#     "{{ bos_token }}"
+#     "{% if messages[0]['role'] == 'system' %}{{ raise_exception('System role not supported') }}{% endif %}"
+#     "{% for message in messages %}"
+#     "{% if (message['role'] == 'user') != (loop.index0 % 2 == 0) %}{{ raise_exception('Conversation roles must alternate user/assistant/user/assistant/...') }}{% endif %}"
+#     "{% if (message['role'] == 'assistant') %}{% set role = 'model' %}{% else %}{% set role = message['role'] %}{% endif %}"
+#     "{{ '<start_of_turn>' + role + '\\n' + message['content'] | trim + '<end_of_turn>\\n' }}"
+#     "{% endfor %}"
+#     "{% if add_generation_prompt %}{{'<start_of_turn>model\\n'}}{% endif %}"
+# )
 
-tokenizer.pad_token = tokenizer.eos_token
+# tokenizer.pad_token = tokenizer.eos_token
 
 # from transformers import BitsAndBytesConfig
 
@@ -110,7 +112,7 @@ def format_sharegpt_to_gemma(example):
 # Apply the map function
 formatted_dataset = filtered_dataset.map(format_sharegpt_to_gemma, num_proc=4)
 formatted_dataset_text = formatted_dataset.select_columns(["text"])
-sampled_formatted_dataset_text = formatted_dataset_text.shuffle(seed=42).select(range(50))
+# sampled_formatted_dataset_text = formatted_dataset_text.shuffle(seed=42).select(range(50))
 
 
 # %%
@@ -140,16 +142,16 @@ peft_config = LoraConfig(
     target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
 )
 
-output_dir = "./results/models/gemma-2b/sft/v1"
+output_dir = "./results/models/gemma-2b-it/sft/v1"
 
 training_args = SFTConfig(
     output_dir=output_dir,
     # num_train_epochs=1,
-    per_device_train_batch_size=4, # Increased for H100 throughput
-    gradient_accumulation_steps=8,
+    per_device_train_batch_size=2, # Increased for H100 throughput
+    gradient_accumulation_steps=16,
     packing=True,
     gradient_checkpointing=True,
-    max_seq_length=2048,
+    max_seq_length=4096,
     dataset_text_field="text",
     optim="adamw_torch",        # Native torch optimizer is faster on H100
     bf16=True,                  # Native H100 format
@@ -158,7 +160,7 @@ training_args = SFTConfig(
     save_steps=100,             # Save checkpoint every 100 steps
     save_total_limit=3,         # Keep only last 3 checkpoints to manage disk space
     save_only_model=True,
-    report_to="none"
+    report_to="none",
 )
 
 trainer = SFTTrainer(
