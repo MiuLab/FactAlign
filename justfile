@@ -11,3 +11,10 @@ sft:
 
 kto:
     bash train_kto.sh
+
+
+vllm-gemma-4-31B-it:
+    vllm serve google/gemma-4-31B-it \
+        --max-model-len 65536 \
+        --gpu-memory-utilization 0.85 \
+        --default-chat-template-kwargs '{"enable_thinking": false}'

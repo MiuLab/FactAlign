@@ -31,8 +31,8 @@ from common import shared_config
 #     'none',  (turns off a side and returns an empty response)
 # ]
 ################################################################################
-side_1 = 'placeholder'
-side_2 = 'vanilla_prompting'
+side_1 = 'vanilla_prompting'
+side_2 = 'none'
 parallelize = True
 save_results = True
 
@@ -53,7 +53,7 @@ save_results = True
 #     'claude_instant',
 # ]
 ################################################################################
-responder_model_short = 'gemma_2b_sft'  # 'gpt_35_turbo'
+# responder_model_short = 'gemma_2b_sft'  # 'gpt_35_turbo'
 
 ################################################################################
 #                               DEBUG SETTINGS
@@ -77,8 +77,8 @@ show_responder_responses = True
 # ]
 # Old LongFact versions can be used by setting `task` to their directory.
 ################################################################################
-# task_short = 'datasets/longfact-objects_gpt4turbo_06-16-2024-2/'
-task_short = 'longfact/object_sampled_114/'
+task_short = 'longfact/object_sampled/'
+# task_short = 'datasets/longfact-objects_gpt4turbo_06-14-2024/' # 30 * 38 prompts
 shuffle_data = False
 max_num_examples = -1
 add_universal_postamble = True
@@ -103,7 +103,8 @@ response_length_postamble = (
 # task: Tuple[str, str, str] = overriden by model name and data fields.
 ################################################################################
 # responder_model = shared_config.model_options[responder_model_short]
-responder_model = "vllm:meta-llama/Meta-Llama-3-8B-Instruct"
+responder_model = "vllm:Columbia-NLP/gemma-2b-zephyr-sft"
+# responder_model = "vllm:meta-llama/Meta-Llama-3-8B-Instruct"
 # responder_model = "vllm:../fact-align/experiments/gemma-2b-zephyr-sft/kto-mix-14k-lf-response-f1_0.75-dedup-kto-rep"
 # responder_model = "vllm:../fact-align/experiments/gemma-2b-zephyr-sft/kto-mix-14k-lf-response-f1_0.75-fg-calibration_gt"
 # responder_model = "vllm:../fact-align/experiments/gemma-2b-zephyr-sft/kto-mix-14k-lf-response-f1_0.75-calibration_r12pct"

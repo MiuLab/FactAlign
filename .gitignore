@@ -7,3 +7,10 @@ cache/
 long-form-factuality/data/
 long-form-factuality/datasets/atlas
 results
+results_old/
+**/__pycache__/
+logs/
+*.log
+**/justfile
+notebooks/
+notes.md

@@ -53,6 +53,7 @@ def apply_chat_template(
             raise ValueError(
                 f"Could not format example as dialogue for `kto` task! Require OpenAI format for all messages"
             )
+
         example["prompt"] = tokenizer.apply_chat_template(example["prompt"], tokenize=False)
         example["completion"] = tokenizer.apply_chat_template(example["completion"], tokenize=False)
     else:
@@ -163,6 +164,19 @@ def main():
     # For Phi-3 tokenizer, we need to remove the eos_token from the chat template
     if tokenizer.chat_template == "{% for message in messages %}{% if message['role'] == 'system' %}{{'<|system|>\n' + message['content'] + '<|end|>\n'}}{% elif message['role'] == 'user' %}{{'<|user|>\n' + message['content'] + '<|end|>\n'}}{% elif message['role'] == 'assistant' %}{{'<|assistant|>\n' + message['content'] + '<|end|>\n'}}{% endif %}{% endfor %}{% if add_generation_prompt %}{{ '<|assistant|>\n' }}{% else %}{{ eos_token }}{% endif %}":
         tokenizer.chat_template = "{% for message in messages %}{% if message['role'] == 'system' %}{{'<|system|>\n' + message['content'] + '<|end|>\n'}}{% elif message['role'] == 'user' %}{{'<|user|>\n' + message['content'] + '<|end|>\n'}}{% elif message['role'] == 'assistant' %}{{'<|assistant|>\n' + message['content'] + '<|end|>\n'}}{% endif %}{% endfor %}{% if add_generation_prompt %}{{ '<|assistant|>\n' }}{% endif %}"
+
+    if "gemma-2b" in model_args.model_name_or_path:
+        tokenizer.chat_template = (
+            "{{ bos_token }}"
+            "{% if messages[0]['role'] == 'system' %}{{ raise_exception('System role not supported') }}{% endif %}"
+            "{% for message in messages %}"
+            "{% if (message['role'] == 'assistant') %}{% set role = 'model' %}{% else %}{% set role = message['role'] %}{% endif %}"
+            "{{ '<start_of_turn>' + role + '\\n' + message['content'] | trim + '<end_of_turn>\\n' }}"
+            "{% endfor %}"
+            "{% if add_generation_prompt %}{{'<start_of_turn>model\\n'}}{% endif %}"
+        )
+
+    logger.info(f"\nTokenizer chat template: {tokenizer.chat_template}")
 
     #####################
     # Apply chat template

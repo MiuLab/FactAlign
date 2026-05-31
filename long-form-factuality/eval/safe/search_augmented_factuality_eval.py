@@ -25,11 +25,16 @@ from eval.safe import get_atomic_facts
 from eval.safe import rate_atomic_fact
 # pylint: enable=g-bad-import-order
 
+from loguru import logger
+
+logger.remove()
+logger.add("app.log")
+
 IRRELEVANT_LABEL = 'Irrelevant'
 SUPPORTED_LABEL = rate_atomic_fact.SUPPORTED_LABEL
 NOT_SUPPORTED_LABEL = rate_atomic_fact.NOT_SUPPORTED_LABEL
 
-_MAX_PIPELINE_RETRIES = 3
+_MAX_PIPELINE_RETRIES = 2
 
 
 class CheckedStatement:
@@ -170,6 +175,7 @@ def classify_relevance_and_rate(
         checked_statements.append(checked_statement)
         revised_fact_dicts.append(revised_fact_dict)
         past_steps_dicts.append(past_steps_dict)
+    
 
   return {
       'checked_statements': [item.data for item in checked_statements],
@@ -180,13 +186,28 @@ def classify_relevance_and_rate(
 
 
 def main(prompt: str, response: str, rater: modeling.Model) -> dict[str, Any]:
+
+  logger.debug(f"|{'Prompt':=^100}|")
+  logger.debug(prompt)
+  logger.debug(f"|{'-'*100}|")
+
+  logger.debug(f"|{'Response':+^100}|")
+  logger.debug(response)
+  logger.debug(f"|{'-'*100}|")
+
   atomic_facts = get_atomic_facts.main(response=response, model=rater)
+
+  logger.debug(f"|{'Atomic facts':-^100}|")
+  logger.debug(atomic_facts)
+  logger.debug(f"|{'-'*100}|")
+
   rating_result = classify_relevance_and_rate(
       prompt=prompt,
       response=response,
       sentences_and_atomic_facts=atomic_facts['all_atomic_facts'],
       rater=rater,
   )
+
   return {
       'prompt': prompt, 'response': response, **atomic_facts, **rating_result
   }

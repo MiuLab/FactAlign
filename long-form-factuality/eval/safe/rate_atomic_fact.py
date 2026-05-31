@@ -25,6 +25,11 @@ from eval.safe import config as safe_config
 from eval.safe import query_serper, query_ddg, query_colbert
 # pylint: enable=g-bad-import-order
 
+from loguru import logger
+
+logger.remove()
+logger.add("app.log")
+
 SUPPORTED_LABEL = 'Supported'
 NOT_SUPPORTED_LABEL = 'Not Supported'
 
@@ -95,6 +100,10 @@ def call_search(
   """Call Google Search to get the search result."""
   search_query += f' {search_postamble}' if search_postamble else ''
 
+  logger.debug(f"|{'Search Query:-^50}'}|")
+  logger.debug(f"{search_query}")
+  logger.debug(f"|{'-'*50}|")
+
   if search_type == 'serper':
     serper_searcher = query_serper.SerperAPI(serper_api_key, k=num_searches)
     return serper_searcher.run(search_query, k=num_searches)
@@ -103,6 +112,7 @@ def call_search(
     return ddg_searcher.run(search_query)
   elif search_type == 'colbert':
     colbert_searcher = query_colbert.ColBERTAPI(colbert_server_url, k=num_searches)
+    
     return colbert_searcher.run(search_query)
   else:
     raise ValueError(f'Unsupported search type: {search_type}')
@@ -120,8 +130,18 @@ def maybe_get_next_search(
   
   full_prompt = _NEXT_SEARCH_FORMAT.replace(_STATEMENT_PLACEHOLDER, atomic_fact)
   full_prompt = full_prompt.replace(_KNOWLEDGE_PLACEHOLDER, knowledge)
+
+  logger.debug(f"🔍⏩⏩|{'Next Search Prompt:-^50}'}|")
+  logger.debug(f"{full_prompt}")
+  logger.debug(f"|{'-'*50}|")
+
   full_prompt = utils.strip_string(full_prompt)
   model_response = model.generate(full_prompt, do_debug=debug)
+
+  logger.debug(f"|{'Next Search Response:-^50}'}|⏪⏪🔍")
+  logger.debug(f"{model_response}")
+  logger.debug(f"|{'-'*50}|")
+
   query = utils.extract_first_code_block(model_response, ignore_language=True)
 
   if model_response and query:
@@ -146,9 +166,19 @@ def maybe_get_final_answer(
   full_prompt = _FINAL_ANSWER_FORMAT.replace(
       _STATEMENT_PLACEHOLDER, atomic_fact
   )
+
   full_prompt = full_prompt.replace(_KNOWLEDGE_PLACEHOLDER, knowledge)
   full_prompt = utils.strip_string(full_prompt)
+
+  logger.debug(f"✅⏩⏩|{'Final Answer Prompt:-^50}'}|")
+  logger.debug(f"{full_prompt}")
+  logger.debug(f"|{'-'*50}|")
+  
   model_response = model.generate(full_prompt, do_debug=debug)
+  
+  logger.debug(f"|{'Final Answer Response:-^50}'}|⏪⏪✅")
+  logger.debug(f"{model_response}")
+  logger.debug(f"|{'-'*50}|")
   answer = utils.extract_first_square_brackets(model_response)
   answer = re.sub(r'[^\w\s]', '', answer).strip()
 

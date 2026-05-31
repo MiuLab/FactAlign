@@ -48,6 +48,11 @@ from eval.safe import config as safe_config
 from eval.safe import search_augmented_factuality_eval as safe
 # pylint: enable=g-bad-import-order
 
+from loguru import logger
+
+logger.remove()
+logger.add("app.log")
+
 _RESULT_PATH = flags.DEFINE_string(
     'result_path', '', 'Path to the result file to eval.'
 )

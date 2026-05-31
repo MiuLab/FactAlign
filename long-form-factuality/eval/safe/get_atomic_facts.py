@@ -24,7 +24,6 @@ from third_party.factscore import atomic_facts
 _SENTENCE = 'sentence'
 _ATOMIC_FACTS = 'atomic_facts'
 
-
 def convert_atomic_facts_to_dicts(
     outputted_facts: list[tuple[str, list[str]]]
 ) -> list[dict[str, Any]]:
