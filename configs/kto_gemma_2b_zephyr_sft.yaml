@@ -6,13 +6,13 @@ use_peft: false
 
 # Data training arguments
 dataset_mixer:
-  trl-lib/kto-mix-14k: 1.0
-  # argilla/ultrafeedback-binarized-preferences-cleaned-kto: 1.0 # 0.05
+  # trl-lib/kto-mix-14k: 1.0
+  argilla/ultrafeedback-binarized-preferences-cleaned-kto: 1.0 # 0.05
   chaoweihuang/factalign-gemma2-f1_0.75: 1.0
 
 dataset_splits:
-- train
-- test
+- train[:99%]
+- train[99%:]
 
 preprocessing_num_workers: 12
 
@@ -43,12 +43,12 @@ max_length: 1024
 max_prompt_length:  512
 
 # Memory & Throughput
-gradient_checkpointing: true
+gradient_checkpointing: false
 gradient_checkpointing_kwargs:
   use_reentrant: false
-per_device_train_batch_size: 1 # Optimized for H100 80GB (Gemma-2B is lightweight)
-per_device_eval_batch_size: 2
-gradient_accumulation_steps: 16 # Maintain effective batch size of 16 with zero accumulation overhead
+per_device_train_batch_size: 4 # Optimized for H100 80GB (Gemma-2B is lightweight)
+per_device_eval_batch_size: 8
+gradient_accumulation_steps: 4 # Maintain effective batch size of 16 with zero accumulation overhead
 
 
 # Output

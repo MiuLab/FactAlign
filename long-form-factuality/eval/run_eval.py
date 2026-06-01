@@ -53,6 +53,9 @@ from loguru import logger
 logger.remove()
 logger.add("app.log")
 
+from dotenv import load_dotenv
+load_dotenv('../.env')
+
 _RESULT_PATH = flags.DEFINE_string(
     'result_path', '', 'Path to the result file to eval.'
 )
