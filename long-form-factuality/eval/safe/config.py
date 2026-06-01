@@ -34,8 +34,12 @@ from common import shared_config
 #     'claude_instant',
 # ]
 ################################################################################
+claim_extraction_model = 'gpt-5.2'
+claim_extraction_model_temp = 0
+claim_extraction_max_tokens = 1024
+
 model_short = 'llama_3_1_8b_it'
-model_temp = 0.1
+model_temp = 0
 max_tokens = 512
 
 ################################################################################

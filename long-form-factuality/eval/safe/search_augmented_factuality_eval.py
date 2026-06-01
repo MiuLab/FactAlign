@@ -27,9 +27,6 @@ from eval.safe import rate_atomic_fact
 
 from loguru import logger
 
-logger.remove()
-logger.add("app.log")
-
 IRRELEVANT_LABEL = 'Irrelevant'
 SUPPORTED_LABEL = rate_atomic_fact.SUPPORTED_LABEL
 NOT_SUPPORTED_LABEL = rate_atomic_fact.NOT_SUPPORTED_LABEL
@@ -185,28 +182,37 @@ def classify_relevance_and_rate(
   }
 
 
-def main(prompt: str, response: str, rater: modeling.Model) -> dict[str, Any]:
+def main(prompt: str, response: str, claim_extraction_model: modeling.Model, rater: modeling.Model) -> dict[str, Any]:
 
-  logger.debug(f"|{'Prompt':=^100}|")
-  logger.debug(prompt)
-  logger.debug(f"|{'-'*100}|")
+  logger.debug(f"{'Prompt':=^100}")
+  logger.opt(colors=True).debug(f"<green>{prompt}</green>")
 
-  logger.debug(f"|{'Response':+^100}|")
-  logger.debug(response)
-  logger.debug(f"|{'-'*100}|")
+  logger.debug(f"{'Response':=^100}")
+  logger.opt(colors=True).debug(f"<green>{response}</green>")
 
-  atomic_facts = get_atomic_facts.main(response=response, model=rater)
+  atomic_facts = get_atomic_facts.main(prompt=prompt, response=response, 
+  model=claim_extraction_model)
 
-  logger.debug(f"|{'Atomic facts':-^100}|")
-  logger.debug(atomic_facts)
-  logger.debug(f"|{'-'*100}|")
+  if atomic_facts['all_atomic_facts']:
+    total_atomic_facts = sum([len(el['atomic_facts']) for el in atomic_facts['all_atomic_facts']])
 
-  rating_result = classify_relevance_and_rate(
-      prompt=prompt,
-      response=response,
-      sentences_and_atomic_facts=atomic_facts['all_atomic_facts'],
-      rater=rater,
-  )
+    logger.opt(colors=True).debug(f"Number of sentences: <yellow>{len(atomic_facts['all_atomic_facts'])}</yellow>")
+    logger.opt(colors=True).debug(f"Number of atomic facts: <yellow>{total_atomic_facts}</yellow>")
+
+    for el in atomic_facts['all_atomic_facts']:
+      logger.opt(colors=True).debug(f"<green>{el['sentence']}</green>")
+
+      for af in el['atomic_facts']:
+        logger.opt(colors=True).debug(f"\t<blue>{af}</blue>")
+
+  # rating_result = classify_relevance_and_rate(
+  #     prompt=prompt,
+  #     response=response,
+  #     sentences_and_atomic_facts=atomic_facts['all_atomic_facts'],
+  #     rater=rater,
+  # )
+
+  rating_result = {}
 
   return {
       'prompt': prompt, 'response': response, **atomic_facts, **rating_result
