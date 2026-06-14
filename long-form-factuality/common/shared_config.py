@@ -37,7 +37,7 @@ people, numbers, events, locations, dates, times, etc.)
 # Factiverse OpenAI key
 openai_api_key = '...'
 anthropic_api_key = ''
-serper_api_key = '...'
+serper_api_key = ''
 vllm_server_url = 'http://0.0.0.0:8000/v1'
 vllm_stop_token_ids = [107]
 colbert_server_url = 'http://127.0.0.1:8893/api/search'
@@ -70,7 +70,8 @@ model_options = {
     'gpt_oss_20b': 'vllm:openai/gpt-oss-20b',
     'gemma-4-31B-it': 'vllm:google/gemma-4-31B-it',
     'gemma-2b-zephyr-sft': 'vllm:Columbia-NLP/gemma-2b-zephyr-sft',
-
+    'gpt-5.2': 'mlflow:gpt-3.5-turbo',
+    'gemma-3-12b-it': 'vllm:google/gemma-3-12b-it',
 }
 model_string = {
     'gpt_4_turbo': 'gpt4turbo',
@@ -97,8 +98,13 @@ model_string = {
     'gpt_oss_20b': 'gpt_oss_20b',
     'gemma-4-31B-it': 'gemma-4-31B-it',
     'gemma-2b-zephyr-sft': 'gemma-2b-zephyr-sft',
+    'gpt-5.2': 'gpt-5.2',
+    'gemma-3-12b-it': 'gemma-3-12b-it'
 }
+
 task_options = {}
 root_dir = '/'.join(os.path.abspath(__file__).split('/')[:-2])
 path_to_data = 'datasets/'
-path_to_result = 'results/prompt_response/gemma-2b-zephyr-sft/'
+path_to_result = 'results/prompt_response/gemma-2b-it/run 1'
+# path_to_result = 'results/prompt_response/gemma-2b-it/test'
+# path_to_result = 'results/prompt_response/gemma-2b-it-kto-v1'

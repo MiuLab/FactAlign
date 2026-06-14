@@ -116,7 +116,7 @@ def classify_relevance_and_rate_single(
     return checked_statement, revised_fact_dict, {}
 
   rate_data, past_steps_dict = rate_atomic_fact.check_atomic_fact(
-      atomic_fact=self_contained_atomic_fact, rater=rater
+      atomic_fact=atomic_fact, rater=rater
   )
 
   if not isinstance(rate_data, rate_atomic_fact.FinalAnswer):
@@ -205,14 +205,12 @@ def main(prompt: str, response: str, claim_extraction_model: modeling.Model, rat
       for af in el['atomic_facts']:
         logger.opt(colors=True).debug(f"\t<blue>{af}</blue>")
 
-  # rating_result = classify_relevance_and_rate(
-  #     prompt=prompt,
-  #     response=response,
-  #     sentences_and_atomic_facts=atomic_facts['all_atomic_facts'],
-  #     rater=rater,
-  # )
-
-  rating_result = {}
+  rating_result = classify_relevance_and_rate(
+      prompt=prompt,
+      response=response,
+      sentences_and_atomic_facts=atomic_facts['all_atomic_facts'],
+      rater=rater,
+  )
 
   return {
       'prompt': prompt, 'response': response, **atomic_facts, **rating_result

@@ -55,7 +55,7 @@ SPACY_MODEL = spacy.load('en_core_web_sm')
 DEMON_DIR = 'third_party/factscore/demos/'
 ATOMIC_FACT_INSTRUCTION = """
 # Your role:
-You are given a sentence and its context (a pair of prompt and response where the sentence originates). Your task is to break the sentence down into a list of atomic facts. An atomic fact is a sentence containing a singular piece of information that specifies a fact and can be fact-checked against evidence from the real world. Each atomic fact in the outputted list should contain a different piece of information. The atomic fact should be well contexualized, i.e the extraced atomic fact should contain all the information it needs from its sourrounding to be understood without the original sourrounding sentences. Like pronouns should be replaced by person's actual name, title, organization, place, events, etc, and correct time, geographic region or additional necessary context should be added.
+You are given a sentence and its context (a pair of prompt and response where the sentence originates). Your task is to break the sentence down into a list of atomic facts. An atomic fact is a sentence containing a singular piece of information that specifies a fact and can be fact-checked against evidence from the real world. Each atomic fact in the outputted list should contain a different piece of information. The atomic fact should be well contexualized, i.e the extracted atomic fact should contain all the information it needs from its sourrounding to be understood without the original sourrounding sentences. Like pronouns should be replaced by person's actual name, title, organization, place, events, etc, and correct time, geographic region or additional necessary context should be added.
 
 # Your task:
 You are given a prompt, its response below.
@@ -65,7 +65,7 @@ Response (delimited by ---):
 {response}
 ---
 
-Based on the prompt and response above, your task is to generate list of contextualized atomic facts from the input sentence below. Only output the atomic facts as a list, with each item starting with "- ". Do not include other formatting. Do not repeat atomic facts. Only include atomic facts that is literally part of the input sentence below, else refrain from including the fact.
+Based on the prompt and response above, your task is to generate list of contextualized atomic facts from the input sentence below. Only output the atomic facts as a list, with each item starting with "- ". Do not include other formatting. Do not repeat atomic facts. Only include atomic facts that is literally part of the input sentence below, else refrain from including the fact. Return literal string "no atomic facts" if no atomic facts are found.
 
 Sentence: {sentence}
 """
@@ -78,7 +78,7 @@ You are an intelligent information extractor and fact checker.
 Your task is to filter out redundant atomic facts from a list of atomic facts, that are repetition of another fact, generalization of another fact, specialization of another fact or paraphrase of another fact.
 
 # Input:
-For the following atomic facts listed below, remove all the redundant and unimportant fact-check unworthy facts.
+For the following atomic facts listed below, remove all the redundant facts.
 
 # Atomic Facts (itemized by -, delimited by ----): 
 ---
@@ -249,10 +249,14 @@ class AtomicFactGenerator(object):
       for prompt in prompts:
         if self.other_lm is not None:
           atomic_facts = self.other_lm.generate(prompt, temperature=0)
-          output = self.other_lm.generate(
-            FILTER_REDUNDANT_FACTS_INSTRUCTION.format(atomic_facts=atomic_facts),
-            temperature=0
-          )
+
+          if "no atomic facts" not in atomic_facts:
+            output = self.other_lm.generate(
+              FILTER_REDUNDANT_FACTS_INSTRUCTION.format(atomic_facts=atomic_facts),
+              temperature=0
+            )
+          else:
+            output = ""
         else:
           raise ValueError('other_lm is None')
 

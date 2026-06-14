@@ -372,7 +372,7 @@ def main(
 ) -> tuple[bool, str, dict[str, Any]]:
   """Check if the fact is relevant and modify it to be self-contained."""
   model_responses = {'atomic_fact': atomic_fact}
-  model_responses['revised_fact'], atomic_fact = revise_fact(
+  model_responses['revised_fact'], self_contained_atomic_fact = revise_fact(
       response=response, atomic_fact=atomic_fact, model=model
   )
   if safe_config.do_check_relevance:
@@ -383,4 +383,4 @@ def main(
     model_responses['is_relevant'] = ""
     is_relevant = True
 
-  return is_relevant, atomic_fact, model_responses
+  return is_relevant, self_contained_atomic_fact, model_responses

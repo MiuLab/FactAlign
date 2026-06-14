@@ -194,8 +194,8 @@ class VllmModel(lf.LanguageModel):
   @functools.cached_property
   def _api_initialized(self):
     """No API key is required for vllm. Just set the base_url."""
-    openai.api_base = self.base_url
-    openai.api_key = "vllm"
+    # openai.api_base = self.base_url
+    # openai.api_key = "vllm"
     return True
 
   @property
@@ -247,6 +247,8 @@ class VllmModel(lf.LanguageModel):
       content = prompt.text
 
       response = openai.ChatCompletion.create(
+          api_base=self.base_url,
+          api_key="vllm",
           messages=[{'role': 'user', 'content': content}],
           **self._get_request_args(self.sampling_options),
       )

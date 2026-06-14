@@ -33,7 +33,7 @@ from common import shared_config
 #     'claude_instant',
 # ]
 ################################################################################
-generator_model = 'gpt_4_turbo'
+generator_model = 'gpt-5.2'
 generation_temp = 1.0
 
 ################################################################################
@@ -47,7 +47,7 @@ generation_temp = 1.0
 # save_results: bool = whether to save results.
 ################################################################################
 subtask = 'longfact_objects'
-num_prompts_to_generate = 2
+num_prompts_to_generate = 30
 max_in_context_examples = 10
 save_results = True
 
