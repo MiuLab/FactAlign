@@ -47,7 +47,7 @@ generation_temp = 1.0
 # save_results: bool = whether to save results.
 ################################################################################
 subtask = 'longfact_objects'
-num_prompts_to_generate = 30
+num_prompts_to_generate = 5
 max_in_context_examples = 10
 save_results = True
 

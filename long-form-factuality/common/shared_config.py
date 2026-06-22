@@ -105,6 +105,6 @@ model_string = {
 task_options = {}
 root_dir = '/'.join(os.path.abspath(__file__).split('/')[:-2])
 path_to_data = 'datasets/'
-path_to_result = 'results/prompt_response/gemma-2b-it/run 1'
-# path_to_result = 'results/prompt_response/gemma-2b-it/test'
-# path_to_result = 'results/prompt_response/gemma-2b-it-kto-v1'
+path_to_result = 'results/prompt_response/gemma-2b-it/prompt_v6'
+# path_to_result = 'results/prompt_response/gemma-2b-it-kto-v1/prompt_v6'
+
