@@ -928,6 +928,11 @@ class FGKTOTrainer(Trainer):
         deepspeed_plugin = self.accelerator.state.deepspeed_plugin
         config_kwargs = deepcopy(deepspeed_plugin.deepspeed_config)
 
+        if "optimizer" in config_kwargs:
+            del config_kwargs["optimizer"]
+        if "scheduler" in config_kwargs:
+            del config_kwargs["scheduler"]
+
         if model is not None:
             if hasattr(model, "config"):
                 hidden_size = (

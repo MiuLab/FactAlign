@@ -5,7 +5,7 @@ downcast_bf16: 'no'
 gpu_ids: all
 machine_rank: 0
 main_training_function: main
-mixed_precision: 'fp16'
+mixed_precision: 'bf16' # changed here from fp16
 num_machines: 1
 num_processes: 2
 rdzv_backend: static

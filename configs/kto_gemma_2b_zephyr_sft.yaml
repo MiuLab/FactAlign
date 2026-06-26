@@ -1,0 +1,60 @@
+# Model arguments
+model_name_or_path: google/gemma-2b-it
+torch_dtype: bfloat16
+use_flash_attention_2: true
+use_peft: false
+
+# Data training arguments
+dataset_mixer:
+  # trl-lib/kto-mix-14k: 1.0
+  argilla/ultrafeedback-binarized-preferences-cleaned-kto: 1.0 # 0.05
+  chaoweihuang/factalign-gemma2-f1_0.75: 1.0
+
+dataset_splits:
+- train[:99%]
+- train[99%:]
+
+preprocessing_num_workers: 12
+
+# KTO Trainer arguments
+bf16: true
+beta: 0.1
+desirable_weight: 1.15 # 1.0
+undesirable_weight: 1.0
+loss_type: fg_kto
+loss_weight: 1.0
+fg_loss_weight: 1.0
+fg_beta: 0.5
+
+# Evaluation & Logging
+do_eval: true
+evaluation_strategy: steps
+eval_steps: 500
+logging_steps: 10
+log_level: info
+
+# Optimization Hyperparameters
+optim: adamw_8bit
+learning_rate: 5.0e-7
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+num_train_epochs: 1
+max_length: 1024
+max_prompt_length:  512
+
+# Memory & Throughput
+gradient_checkpointing: false
+gradient_checkpointing_kwargs:
+  use_reentrant: false
+per_device_train_batch_size: 4 # Optimized for H100 80GB (Gemma-2B is lightweight)
+per_device_eval_batch_size: 8
+gradient_accumulation_steps: 4 # Maintain effective batch size of 16 with zero accumulation overhead
+
+
+# Output
+output_dir: /home/pratuat/repositories/FactAlign/results/models/gemma-2b-it/kto/v1
+save_strategy: "steps"
+save_steps: 500
+save_only_model: true
+push_to_hub: false
+seed: 42

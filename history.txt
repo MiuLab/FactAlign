@@ -1,0 +1,12 @@
+ 1001  conda create -n fact-align python=3.10
+ 1002  conda activate fact-align
+ 1007  pip install -r requirements.txt 
+ 1008  cd ../alignment-handbook/
+ 1011  python -m pip install .
+ 1012  cd ../FactAlign/
+ 1020  pip install deepspeed==0.14.4
+ 1034  pip install huggingface-hub==0.19.2
+ 1036  pip install rich
+ 1043  pip install wandb==0.18.3
+ 1045  bash train_kto.sh 
+ 1046  pip freeze > freeze.txt

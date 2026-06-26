@@ -1,0 +1,30 @@
+{"prompt": "Tell me about the Stanford Alpaca dataset."}
+{"prompt": "Tell me about the FlashAttention-2 GPU attention kernel implementation for Transformer models."}
+{"prompt": "Tell me about the DeepSpeed ZeRO-Infinity optimizer system."}
+{"prompt": "Tell me about the PyTorch Fully Sharded Data Parallel (FSDP) training system."}
+{"prompt": "Tell me about the Hugging Face \u201cDatasets\u201d library."}
+{"prompt": "Who is Diederik P. Kingma?"}
+{"prompt": "Tell me about the MLPerf Inference Benchmark suite."}
+{"prompt": "Tell me about the Stanford Alpaca dataset for instruction-following language model fine-tuning."}
+{"prompt": "Tell me about the LAION-5B dataset."}
+{"prompt": "Tell me about the Weights & Biases (wandb) platform."}
+{"prompt": "Tell me about the NVIDIA NeMo framework."}
+{"prompt": "Tell me about the company Weights & Biases (W&B)."}
+{"prompt": "Tell me about the Ludwig (Uber AI) toolbox for training deep learning models without writing code."}
+{"prompt": "What happened during the 2013 ImageNet Large Scale Visual Recognition Challenge (ILSVRC)?"}
+{"prompt": "Tell me about the company MosaicML."}
+{"prompt": "Tell me about the OpenMMLab MMDetection library."}
+{"prompt": "Tell me about the Open Neural Network Exchange (ONNX)."}
+{"prompt": "Tell me about the OpenAI Triton language and compiler for writing custom GPU kernels used in deep learning workloads."}
+{"prompt": "Tell me about the LAION-5B dataset for training large-scale vision-language models."}
+{"prompt": "Tell me about the company Hugging Face."}
+{"prompt": "Tell me about the Allen Institute for AI\u2019s Semantic Scholar Open Research Corpus (S2ORC)."}
+{"prompt": "Tell me about the MosaicML Composer training library."}
+{"prompt": "What happened during the 2019 NeurIPS Competition: Predicting Generalization in Deep Learning?"}
+{"prompt": "Tell me about the Allen Institute for AI (AI2) \u201cMosaic\u201d dataset for scientific text mining."}
+{"prompt": "Tell me about the Berkeley DeepDrive (BDD100K) dataset."}
+{"prompt": "Tell me about the EleutherAI \u201cThe Pile\u201d dataset."}
+{"prompt": "Tell me about the BigScience BLOOM model."}
+{"prompt": "Tell me about the vLLM inference engine for large language models."}
+{"prompt": "Tell me about the company Determined AI."}
+{"prompt": "Who is Alex Krizhevsky?"}

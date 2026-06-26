@@ -24,7 +24,6 @@ from third_party.factscore import atomic_facts
 _SENTENCE = 'sentence'
 _ATOMIC_FACTS = 'atomic_facts'
 
-
 def convert_atomic_facts_to_dicts(
     outputted_facts: list[tuple[str, list[str]]]
 ) -> list[dict[str, Any]]:
@@ -34,11 +33,11 @@ def convert_atomic_facts_to_dicts(
   ]
 
 
-def main(response: str, model: modeling.Model) -> dict[str, Any]:
+def main(prompt: str, response: str, model: modeling.Model) -> dict[str, Any]:
   atomic_fact_generator = atomic_facts.AtomicFactGenerator(
       api_key='', gpt3_cache_file='', other_lm=model
   )
-  facts, _ = atomic_fact_generator.run(response)
+  facts, _ = atomic_fact_generator.run(prompt, response)
   facts_as_dict = convert_atomic_facts_to_dicts(facts)
   all_atomic_facts = list(
       itertools.chain.from_iterable([f[_ATOMIC_FACTS] for f in facts_as_dict])
