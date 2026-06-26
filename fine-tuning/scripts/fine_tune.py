@@ -46,7 +46,6 @@ tokenizer.padding_side = 'right' # todo
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_ID,
     torch_dtype=torch.float32,      # use fp32 for model weights but  fp16 for optimizer, the setup is more stable.
-    attn_implementation="sdpa",
     use_cache=False,                # Required with gradient checkpointing
 )
 
