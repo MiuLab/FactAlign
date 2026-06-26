@@ -37,6 +37,7 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_ID)
 if tokenizer.pad_token_id is None:
     tokenizer.pad_token = "<pad>"      # Gemma has this token; avoids eos/pad aliasing
+    tokenizer.padding_side = 'right'
 
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_ID,
@@ -77,7 +78,7 @@ training_args = SFTConfig(
     output_dir=OUTPUT_DIR,
     num_train_epochs=1,
     per_device_train_batch_size=2,
-    gradient_accumulation_steps=4,   # effective batch = 4 GPUs × 2 × 2 = 16
+    gradient_accumulation_steps=2,   # effective batch = 4 GPUs × 2 × 2 = 16
     packing=True,
     max_seq_length=2048,
     dataset_text_field="text",
