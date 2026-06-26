@@ -17,3 +17,6 @@ vllm_gemma:
 
 vllm_llama:
     vllm serve "meta-llama/Llama-3.1-8B-Instruct" --gpu-memory-utilization 0.85
+
+slurm-fine-tune:
+    cd fine-tuning && sbatch slurm/slurm_fine_tune.sh
