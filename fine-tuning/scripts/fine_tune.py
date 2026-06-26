@@ -20,6 +20,11 @@ from dotenv import load_dotenv
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from trl import SFTConfig, SFTTrainer
 
+# Experiment tracking
+import mlflow
+import mlflow.data
+from mlflow.data.huggingface_dataset import from_huggingface  # mlflow >= 2.9
+
 load_dotenv()
 
 #%% ==============================================================================
@@ -27,7 +32,7 @@ load_dotenv()
 # ==============================================================================
 
 MODEL_ID = "google/gemma-2b"
-OUTPUT_DIR = "results/models/gemma-2b/fine-tuned/"
+OUTPUT_DIR = "results/models/google-gemma-2b/fine-tuned/v1/"
 FINAL_PATH = os.path.join(OUTPUT_DIR, "final_merged")
 DEEPSPEED_CONFIG = "configs/ds_config_zero2.json"
 TOKENIZER_ID = "google/gemma-2b-it"   # same vocab as gemma-2b, ships with chat template
@@ -35,9 +40,8 @@ TOKENIZER_ID = "google/gemma-2b-it"   # same vocab as gemma-2b, ships with chat 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_ID)
-if tokenizer.pad_token_id is None:
-    tokenizer.pad_token = "<pad>"      # Gemma has this token; avoids eos/pad aliasing
-    tokenizer.padding_side = 'right'
+tokenizer.pad_token = "<pad>"      # Gemma has this token; avoids eos/pad aliasing
+tokenizer.padding_side = 'right' # todo
 
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_ID,
@@ -68,7 +72,7 @@ def format_to_chat(example: dict) -> dict:
 
 dataset = load_dataset("HuggingFaceH4/deita-10k-v0-sft", split="train_sft")
 dataset = dataset.map(format_to_chat, remove_columns=dataset.column_names)
-dataset = dataset.shuffle(seed=42).select(range(2000))
+dataset = dataset.shuffle(seed=42)
 
 #%% ==============================================================================
 # 3. Trainer
@@ -78,7 +82,7 @@ training_args = SFTConfig(
     output_dir=OUTPUT_DIR,
     num_train_epochs=1,
     per_device_train_batch_size=2,
-    gradient_accumulation_steps=2,   # effective batch = 4 GPUs × 2 × 2 = 16
+    gradient_accumulation_steps=4,
     packing=True,
     max_seq_length=2048,
     dataset_text_field="text",
@@ -93,7 +97,7 @@ training_args = SFTConfig(
     save_steps=100,
     save_total_limit=3,
     save_only_model=False,
-    report_to="none",
+    report_to=["mlflow"],
     gradient_checkpointing=True,
     gradient_checkpointing_kwargs={"use_reentrant": False},
     deepspeed=DEEPSPEED_CONFIG,      # DeepSpeed manages distributed comms; DDP flags not needed
@@ -113,8 +117,6 @@ trainer = SFTTrainer(
 #%% ==============================================================================
 # 4. Train
 # ==============================================================================
-
-
 def get_latest_checkpoint(checkpoint_dir: str) -> str | None:
     if not os.path.exists(checkpoint_dir):
         return None
@@ -123,22 +125,32 @@ def get_latest_checkpoint(checkpoint_dir: str) -> str | None:
         return None
     return os.path.join(checkpoint_dir, sorted(checkpoints, key=lambda x: int(x.split("-")[1]))[-1])
 
-
 latest_checkpoint = get_latest_checkpoint(OUTPUT_DIR)
-if latest_checkpoint:
+
+if int(os.environ.get("LOCAL_RANK", 0)) == 0 and latest_checkpoint:
     print(f"Resuming from checkpoint: {latest_checkpoint}")
 
-trainer.train(resume_from_checkpoint=latest_checkpoint)
-print("Training complete!")
+if int(os.environ.get("LOCAL_RANK", 0)) == 0:
+    mlflow.start_run()
+    mlflow.log_params({
+        "dataset_source": "HuggingFaceH4/deita-10k-v0-sft",
+        "dataset_split": "train_sft",
+        "dataset_size": len(dataset),
+        "dataset_seed": 42,
+        "model_id": MODEL_ID,
+    })
 
-#%% ==============================================================================
-# 5. Save
-# ==============================================================================
+# ALL ranks train
+trainer.train(resume_from_checkpoint=latest_checkpoint)
+
+if int(os.environ.get("LOCAL_RANK", 0)) == 0:
+    print("Training complete!")
+    mlflow.end_run()
 
 gc.collect()
 torch.cuda.empty_cache()
 
-# trainer.save_model() coordinates across all ZeRO stages correctly
+# ALL ranks save (ZeRO collective)
 trainer.save_model(FINAL_PATH)
 if trainer.is_world_process_zero():
     tokenizer.save_pretrained(FINAL_PATH)
