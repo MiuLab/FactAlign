@@ -30,13 +30,13 @@ MODEL_ID = "google/gemma-2b"
 OUTPUT_DIR = "results/models/gemma-2b/fine-tuned/"
 FINAL_PATH = os.path.join(OUTPUT_DIR, "final_merged")
 DEEPSPEED_CONFIG = "configs/ds_config_zero2.json"
+TOKENIZER_ID = "google/gemma-2b-it"   # same vocab as gemma-2b, ships with chat template
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
-
-if tokenizer.chat_template is None:
-    tokenizer.chat_template = AutoTokenizer.from_pretrained("google/gemma-2b-it").chat_template
+tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_ID)
+if tokenizer.pad_token_id is None:
+    tokenizer.pad_token = "<pad>"      # Gemma has this token; avoids eos/pad aliasing
 
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_ID,
@@ -77,7 +77,7 @@ training_args = SFTConfig(
     output_dir=OUTPUT_DIR,
     num_train_epochs=1,
     per_device_train_batch_size=2,
-    gradient_accumulation_steps=2,   # effective batch = 4 GPUs × 2 × 2 = 16
+    gradient_accumulation_steps=4,   # effective batch = 4 GPUs × 2 × 2 = 16
     packing=True,
     max_seq_length=2048,
     dataset_text_field="text",
