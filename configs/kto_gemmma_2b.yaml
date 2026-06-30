@@ -1,0 +1,63 @@
+# Model arguments
+model_name_or_path: submodules/fine-tuning/results/models/gemma-2b/fine-tuned/v2/final_merged
+torch_dtype: float16
+deepspeed: configs/deepspeed_zero2.json
+use_flash_attention_2: false
+use_peft: false
+
+# Data training arguments
+dataset_mixer:
+  # trl-lib/kto-mix-14k: 1.0
+  # argilla/ultrafeedback-binarized-preferences-cleaned-kto: 1.0 # 0.05
+  chaoweihuang/factalign-gemma2-f1_0.75: 1.0
+
+dataset_splits:
+- train[:99%]
+- train[99%:]
+
+preprocessing_num_workers: 12
+
+# KTO Trainer arguments
+bf16: false
+fp16: true
+beta: 0.1
+desirable_weight: 1.15 # 1.0
+undesirable_weight: 1.0
+loss_type: fg_kto
+loss_weight: 1.0
+fg_loss_weight: 1.0
+fg_beta: 0.5
+
+# Evaluation & Logging
+do_eval: true
+evaluation_strategy: steps
+eval_steps: 500
+logging_steps: 10
+log_level: info
+report_to: wandb
+
+# Optimization Hyperparameters
+optim: adamw_torch
+learning_rate: 5.0e-7
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+num_train_epochs: 1
+max_length: 1024
+max_prompt_length:  512
+
+# Memory & Throughput
+gradient_checkpointing: true  # Required: V100 32GB with policy + reference model in memory
+gradient_checkpointing_kwargs:
+  use_reentrant: false
+per_device_train_batch_size: 1  # V100 32GB; KTO holds 2 models simultaneously
+per_device_eval_batch_size: 2
+gradient_accumulation_steps: 4  # Effective batch = 4 GPUs × 1 × 4 = 16, same as before
+
+
+# Output
+output_dir: submodules/kto/results/models/gemma-2b/kto/v2-it_1
+save_strategy: "steps"
+save_steps: 500
+save_only_model: true
+push_to_hub: false
+seed: 42
