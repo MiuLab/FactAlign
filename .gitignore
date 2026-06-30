@@ -1,16 +1,20 @@
+# ignore files
 .env
 .envrc
-submodules/
+*.log
 .vscode/
+
+
+# igore list
 __pycache__/**
 cache/
 long-form-factuality/data/
 long-form-factuality/datasets/atlas
-results
-results_old/
+**/results
 **/__pycache__/
 logs/
-*.log
+submodules/
 **/justfile
 notebooks/
 notes.md
+**/wandb

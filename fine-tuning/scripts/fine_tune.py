@@ -18,9 +18,10 @@ import torch
 from datasets import load_dataset
 from dotenv import load_dotenv
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from trl import SFTConfig, SFTTrainer
+from trl import DataCollatorForCompletionOnlyLM, SFTConfig, SFTTrainer
 
 # Experiment tracking
+import wandb
 import mlflow
 import mlflow.data
 from mlflow.data.huggingface_dataset import from_huggingface  # mlflow >= 2.9
@@ -32,7 +33,7 @@ load_dotenv()
 # ==============================================================================
 
 MODEL_ID = "google/gemma-2b"
-OUTPUT_DIR = "results/models/google-gemma-2b/fine-tuned/v1/"
+OUTPUT_DIR = "results/models/google-gemma-2b/fine-tuned/v2/"
 FINAL_PATH = os.path.join(OUTPUT_DIR, "final_merged")
 DEEPSPEED_CONFIG = "configs/ds_config_zero2.json"
 TOKENIZER_ID = "google/gemma-2b-it"   # same vocab as gemma-2b, ships with chat template
@@ -42,6 +43,11 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_ID)
 tokenizer.pad_token = "<pad>"      # Gemma has this token; avoids eos/pad aliasing
 tokenizer.padding_side = 'right' # todo
+
+# Prompt-masked loss: only assistant tokens contribute to cross-entropy.
+# Use token IDs for the response template to avoid string-matching ambiguity.
+response_template_ids = tokenizer.encode("<start_of_turn>model\n", add_special_tokens=False)
+data_collator = DataCollatorForCompletionOnlyLM(response_template_ids, tokenizer=tokenizer)
 
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_ID,
@@ -82,7 +88,7 @@ training_args = SFTConfig(
     num_train_epochs=1,
     per_device_train_batch_size=2,
     gradient_accumulation_steps=4,
-    packing=True,
+    packing=False,
     max_seq_length=2048,
     dataset_text_field="text",
     learning_rate=2.0e-5,
@@ -96,7 +102,7 @@ training_args = SFTConfig(
     save_steps=100,
     save_total_limit=3,
     save_only_model=False,
-    report_to=["mlflow"],
+    report_to=["mlflow", "wandb"],
     gradient_checkpointing=True,
     gradient_checkpointing_kwargs={"use_reentrant": False},
     deepspeed=DEEPSPEED_CONFIG,      # DeepSpeed manages distributed comms; DDP flags not needed
@@ -111,6 +117,7 @@ trainer = SFTTrainer(
     args=training_args,
     train_dataset=dataset,
     tokenizer=tokenizer,
+    data_collator=data_collator,
 )
 
 #%% ==============================================================================
@@ -130,6 +137,26 @@ if int(os.environ.get("LOCAL_RANK", 0)) == 0 and latest_checkpoint:
     print(f"Resuming from checkpoint: {latest_checkpoint}")
 
 if int(os.environ.get("LOCAL_RANK", 0)) == 0:
+    wandb.init(
+        project=os.environ.get("WANDB_PROJECT", "factalign-fine-tuning"),
+        name=os.environ.get("WANDB_RUN_NAME", None),
+        config={
+            "model_id": MODEL_ID,
+            "dataset_source": "HuggingFaceH4/deita-10k-v0-sft",
+            "dataset_split": "train_sft",
+            "dataset_size": len(dataset),
+            "dataset_seed": 42,
+            "num_train_epochs": 1,
+            "per_device_train_batch_size": 2,
+            "gradient_accumulation_steps": 4,
+            "learning_rate": 2.0e-5,
+            "lr_scheduler_type": "cosine",
+            "warmup_ratio": 0.1,
+            "max_seq_length": 2048,
+            "fp16": True,
+            "deepspeed": DEEPSPEED_CONFIG,
+        },
+    )
     mlflow.start_run()
     mlflow.log_params({
         "dataset_source": "HuggingFaceH4/deita-10k-v0-sft",
@@ -145,6 +172,7 @@ trainer.train(resume_from_checkpoint=latest_checkpoint)
 if int(os.environ.get("LOCAL_RANK", 0)) == 0:
     print("Training complete!")
     mlflow.end_run()
+    wandb.finish()
 
 gc.collect()
 torch.cuda.empty_cache()

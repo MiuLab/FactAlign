@@ -1,7 +1,7 @@
 
 vllm:
-    CUDA_VISIBLE_DEVICES=7 vllm serve results/models/gemma-2b/fine-tuned
+    CUDA_VISIBLE_DEVICES=7 vllm serve results/models/gemma-2b/fine-tuned/v1/final_merged
 
 
 sft:
-    PYTHONPATH=. CUDA_VISIBLE_DEVICES=3,4,6,7 torchrun --nproc_per_node=4 scripts/fine_tune.py
+    PYTHONPATH=. CUDA_VISIBLE_DEVICES=2,4,6,7 torchrun --nproc_per_node=4 scripts/fine_tune.py
