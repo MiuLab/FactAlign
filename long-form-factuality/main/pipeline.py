@@ -258,6 +258,7 @@ def main(_) -> None:
       max_tokens=1024,
       show_responses=main_config.show_responder_responses,
       show_prompts=main_config.show_responder_prompts,
+      temperature=0.1,
   )
   print_config('Responder', responder)
 

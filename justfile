@@ -6,6 +6,19 @@
 #         --backend vllm \
 #         --temperature 0.5
 
+
+gen_prompts:
+    PYTHONPATH=/home/pratuat/repositories/FactAlign/long-form-factuality python -m data_creation.pipeline
+
+gen_response:
+    PYTHONPATH=/home/pratuat/repositories/FactAlign/long-form-factuality python -m main.pipeline
+
+run_eval:
+    PYTHONPATH=/home/pratuat/repositories/FactAlign/long-form-factuality python -m eval.run_eval \
+        --result_path='results/prompt_response/gemma-2b-it-kto-v1/prompt_v7_2p/2026-06-22-09-35-36.json' \
+        --eval_side2=False \
+        --parallelize=True
+
 sft:
     PYTHONPATH=. python scripts/sft/main.py
 

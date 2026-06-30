@@ -59,19 +59,7 @@ model_options = {
     'claude_21': 'ANTHROPIC:claude-2.1',
     'claude_20': 'ANTHROPIC:claude-2.0',
     'claude_instant': 'ANTHROPIC:claude-instant-1.2',
-    'gemma_11_2b_it': 'vllm:google/gemma-1.1-2b-it',
-    'gemma_2b_sft': 'vllm:Columbia-NLP/gemma-2b-zephyr-sft',
-    'gemma_2b_sft_kto': 'vllm:../fact-align/experiments/kto',
-    'gemma_4_e4b_it': 'vllm:google/gemma-4-E4B-it',
-    'gpt_oss_120b': 'vllm:openai/gpt-oss-120b',
-    'gemma_4_31b': 'vllm:google/gemma-4-31B',
-    'gemma_4_26b_it': 'vllm:google/gemma-4-26B-A4B-it',
-    'llama_3_1_8b_it': 'vllm:meta-llama/Llama-3.1-8B-Instruct',
-    'gpt_oss_20b': 'vllm:openai/gpt-oss-20b',
-    'gemma-4-31B-it': 'vllm:google/gemma-4-31B-it',
-    'gemma-2b-zephyr-sft': 'vllm:Columbia-NLP/gemma-2b-zephyr-sft',
-    'gpt-5.2': 'mlflow:gpt-3.5-turbo',
-    'gemma-3-12b-it': 'vllm:google/gemma-3-12b-it',
+    'gemma-2b-sft': 'vllm:results/models/gemma-2b/fine-tuned/v2/final_merged',
 }
 model_string = {
     'gpt_4_turbo': 'gpt4turbo',
@@ -97,14 +85,11 @@ model_string = {
     'llama_3_1_8b_it': 'llama_3_1_8b_it',
     'gpt_oss_20b': 'gpt_oss_20b',
     'gemma-4-31B-it': 'gemma-4-31B-it',
-    'gemma-2b-zephyr-sft': 'gemma-2b-zephyr-sft',
-    'gpt-5.2': 'gpt-5.2',
-    'gemma-3-12b-it': 'gemma-3-12b-it'
+    'gemma-2b-sft': 'gemma-2b-sft',
 }
 
 task_options = {}
 root_dir = '/'.join(os.path.abspath(__file__).split('/')[:-2])
 path_to_data = 'datasets/'
-path_to_result = 'results/prompt_response/gemma-2b-it/prompt_v6'
-# path_to_result = 'results/prompt_response/gemma-2b-it-kto-v1/prompt_v6'
+path_to_result = 'results/evals'
 
