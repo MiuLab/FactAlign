@@ -1,0 +1,124 @@
+
+1,3
+nvcc: NVIDIA (R) Cuda compiler driver
+Copyright (c) 2005-2023 NVIDIA Corporation
+Built on Tue_Feb__7_19:32:13_PST_2023
+Cuda compilation tools, release 12.1, V12.1.66
+Build cuda_12.1.r12.1/compiler.32415258_0
+Resolved 240 packages in 47ms
+Checked 225 packages in 553ms
+/mnt/beegfs/home/pratuat/repositories/FactAlign/fine-tuning/.venv/lib/python3.10/site-packages/torch/cuda/__init__.py:54: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/mnt/beegfs/home/pratuat/repositories/FactAlign/fine-tuning/.venv/lib/python3.10/site-packages/torch/cuda/__init__.py:628: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+[2026-06-30 09:52:37,841] torch.distributed.run: [WARNING] 
+[2026-06-30 09:52:37,841] torch.distributed.run: [WARNING] *****************************************
+[2026-06-30 09:52:37,841] torch.distributed.run: [WARNING] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+[2026-06-30 09:52:37,841] torch.distributed.run: [WARNING] *****************************************
+/mnt/beegfs/home/pratuat/repositories/FactAlign/fine-tuning/.venv/lib/python3.10/site-packages/torch/cuda/__init__.py:54: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/mnt/beegfs/home/pratuat/repositories/FactAlign/fine-tuning/.venv/lib/python3.10/site-packages/torch/cuda/__init__.py:54: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[2026-06-30 09:53:06,935] [INFO] [real_accelerator.py:158:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[2026-06-30 09:53:06,937] [INFO] [real_accelerator.py:158:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+`config.hidden_act` is ignored, you should use `config.hidden_activation` instead.
+Gemma's activation function will be set to `gelu_pytorch_tanh`. Please, use
+`config.hidden_activation` if you want to override this behaviour.
+See https://github.com/huggingface/transformers/pull/29402 for more details.
+`config.hidden_act` is ignored, you should use `config.hidden_activation` instead.
+Gemma's activation function will be set to `gelu_pytorch_tanh`. Please, use
+`config.hidden_activation` if you want to override this behaviour.
+See https://github.com/huggingface/transformers/pull/29402 for more details.
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:06<00:06,  6.16s/it]Loading checkpoint shards:  50%|█████     | 1/2 [00:06<00:06,  6.26s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:06<00:00,  2.65s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:06<00:00,  3.18s/it]
+Loading checkpoint shards: 100%|██████████| 2/2 [00:06<00:00,  2.70s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:06<00:00,  3.23s/it]
+[2026-06-30 09:53:53,797] [INFO] [comm.py:637:init_distributed] cdb=None
+[2026-06-30 09:53:53,817] [INFO] [comm.py:637:init_distributed] cdb=None
+[2026-06-30 09:53:53,818] [INFO] [comm.py:668:init_distributed] Initializing TorchBackend in DeepSpeed with backend nccl
+/mnt/beegfs/home/pratuat/repositories/FactAlign/fine-tuning/.venv/lib/python3.10/site-packages/torch/cuda/__init__.py:628: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+/mnt/beegfs/home/pratuat/repositories/FactAlign/fine-tuning/.venv/lib/python3.10/site-packages/torch/cuda/__init__.py:628: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+Unable to determine the device handle for GPU7: 0000:E1:00.0: Unknown Error
+Unable to determine the device handle for GPU7: 0000:E1:00.0: Unknown Error
+Traceback (most recent call last):
+  File "/mnt/beegfs/home/pratuat/repositories/FactAlign/fine-tuning/scripts/fine_tune.py", line 112, in <module>
+    trainer = SFTTrainer(
+  File "/mnt/beegfs/home/pratuat/repositories/FactAlign/fine-tuning/.venv/lib/python3.10/site-packages/huggingface_hub/utils/_deprecation.py", line 101, in inner_f
+    return f(*args, **kwargs)
+  File "/mnt/beegfs/home/pratuat/repositories/FactAlign/fine-tuning/.venv/lib/python3.10/site-packages/trl/trainer/sft_trainer.py", line 364, in __init__
+    with PartialState().local_main_process_first():
+  File "/home/stud/pratuat/.local/share/uv/python/cpython-3.10.20-linux-x86_64-gnu/lib/python3.10/contextlib.py", line 142, in __exit__
+    next(self.gen)
+  File "/mnt/beegfs/home/pratuat/repositories/FactAlign/fine-tuning/.venv/lib/python3.10/site-packages/accelerate/state.py", line 516, in local_main_process_first
+    yield from self._goes_first(self.is_local_main_process)
+  File "/mnt/beegfs/home/pratuat/repositories/FactAlign/fine-tuning/.venv/lib/python3.10/site-packages/accelerate/state.py", line 385, in _goes_first
+    self.wait_for_everyone()
+  File "/mnt/beegfs/home/pratuat/repositories/FactAlign/fine-tuning/.venv/lib/python3.10/site-packages/accelerate/state.py", line 374, in wait_for_everyone
+    torch.distributed.barrier()
+  File "/mnt/beegfs/home/pratuat/repositories/FactAlign/fine-tuning/.venv/lib/python3.10/site-packages/torch/distributed/c10d_logger.py", line 72, in wrapper
+    return func(*args, **kwargs)
+  File "/mnt/beegfs/home/pratuat/repositories/FactAlign/fine-tuning/.venv/lib/python3.10/site-packages/torch/distributed/distributed_c10d.py", line 3439, in barrier
+    work = default_pg.barrier(opts=opts)
+torch.distributed.DistBackendError: NCCL error in: ../torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:1691, unhandled system error (run with NCCL_DEBUG=INFO for details), NCCL version 2.19.3
+ncclSystemError: System call (e.g. socket, malloc) or external library call failed or device error. 
+Last error:
+nvmlDeviceGetHandleByIndex(7) failed: Unknown Error
+Traceback (most recent call last):
+  File "/mnt/beegfs/home/pratuat/repositories/FactAlign/fine-tuning/scripts/fine_tune.py", line 112, in <module>
+    trainer = SFTTrainer(
+  File "/mnt/beegfs/home/pratuat/repositories/FactAlign/fine-tuning/.venv/lib/python3.10/site-packages/huggingface_hub/utils/_deprecation.py", line 101, in inner_f
+    return f(*args, **kwargs)
+  File "/mnt/beegfs/home/pratuat/repositories/FactAlign/fine-tuning/.venv/lib/python3.10/site-packages/trl/trainer/sft_trainer.py", line 364, in __init__
+    with PartialState().local_main_process_first():
+  File "/home/stud/pratuat/.local/share/uv/python/cpython-3.10.20-linux-x86_64-gnu/lib/python3.10/contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "/mnt/beegfs/home/pratuat/repositories/FactAlign/fine-tuning/.venv/lib/python3.10/site-packages/accelerate/state.py", line 516, in local_main_process_first
+    yield from self._goes_first(self.is_local_main_process)
+  File "/mnt/beegfs/home/pratuat/repositories/FactAlign/fine-tuning/.venv/lib/python3.10/site-packages/accelerate/state.py", line 380, in _goes_first
+    self.wait_for_everyone()
+  File "/mnt/beegfs/home/pratuat/repositories/FactAlign/fine-tuning/.venv/lib/python3.10/site-packages/accelerate/state.py", line 374, in wait_for_everyone
+    torch.distributed.barrier()
+  File "/mnt/beegfs/home/pratuat/repositories/FactAlign/fine-tuning/.venv/lib/python3.10/site-packages/torch/distributed/c10d_logger.py", line 72, in wrapper
+    return func(*args, **kwargs)
+  File "/mnt/beegfs/home/pratuat/repositories/FactAlign/fine-tuning/.venv/lib/python3.10/site-packages/torch/distributed/distributed_c10d.py", line 3439, in barrier
+    work = default_pg.barrier(opts=opts)
+torch.distributed.DistBackendError: NCCL error in: ../torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:1691, unhandled system error (run with NCCL_DEBUG=INFO for details), NCCL version 2.19.3
+ncclSystemError: System call (e.g. socket, malloc) or external library call failed or device error. 
+Last error:
+nvmlDeviceGetHandleByIndex(7) failed: Unknown Error
+[2026-06-30 09:53:57,982] torch.distributed.elastic.multiprocessing.api: [ERROR] failed (exitcode: 1) local_rank: 0 (pid: 3782109) of binary: /mnt/beegfs/home/pratuat/repositories/FactAlign/fine-tuning/.venv/bin/python3
+Traceback (most recent call last):
+  File "/mnt/beegfs/home/pratuat/repositories/FactAlign/fine-tuning/.venv/bin/torchrun", line 10, in <module>
+    sys.exit(main())
+  File "/mnt/beegfs/home/pratuat/repositories/FactAlign/fine-tuning/.venv/lib/python3.10/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+    return f(*args, **kwargs)
+  File "/mnt/beegfs/home/pratuat/repositories/FactAlign/fine-tuning/.venv/lib/python3.10/site-packages/torch/distributed/run.py", line 812, in main
+    run(args)
+  File "/mnt/beegfs/home/pratuat/repositories/FactAlign/fine-tuning/.venv/lib/python3.10/site-packages/torch/distributed/run.py", line 803, in run
+    elastic_launch(
+  File "/mnt/beegfs/home/pratuat/repositories/FactAlign/fine-tuning/.venv/lib/python3.10/site-packages/torch/distributed/launcher/api.py", line 135, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/mnt/beegfs/home/pratuat/repositories/FactAlign/fine-tuning/.venv/lib/python3.10/site-packages/torch/distributed/launcher/api.py", line 268, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+scripts/fine_tune.py FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2026-06-30_09:53:57
+  host      : gorina9.ux.uis.no
+  rank      : 1 (local_rank: 1)
+  exitcode  : 1 (pid: 3782110)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-06-30_09:53:57
+  host      : gorina9.ux.uis.no
+  rank      : 0 (local_rank: 0)
+  exitcode  : 1 (pid: 3782109)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================

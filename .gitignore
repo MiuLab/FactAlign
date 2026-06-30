@@ -2,19 +2,16 @@
 .env
 .envrc
 *.log
-.vscode/
-
-
-# igore list
-__pycache__/**
-cache/
-long-form-factuality/data/
-long-form-factuality/datasets/atlas
-**/results
-**/__pycache__/
-logs/
-submodules/
-**/justfile
-notebooks/
+justfile
 notes.md
-**/wandb
+
+
+# ignore list
+.venv/
+.vscode/
+logs/
+cache/
+wandb/
+results/
+notebooks/
+__pycache__/

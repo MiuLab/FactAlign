@@ -22,9 +22,6 @@ from trl import DataCollatorForCompletionOnlyLM, SFTConfig, SFTTrainer
 
 # Experiment tracking
 import wandb
-import mlflow
-import mlflow.data
-from mlflow.data.huggingface_dataset import from_huggingface  # mlflow >= 2.9
 
 load_dotenv()
 
@@ -102,7 +99,7 @@ training_args = SFTConfig(
     save_steps=100,
     save_total_limit=3,
     save_only_model=False,
-    report_to=["mlflow", "wandb"],
+    report_to=["wandb"],
     gradient_checkpointing=True,
     gradient_checkpointing_kwargs={"use_reentrant": False},
     deepspeed=DEEPSPEED_CONFIG,      # DeepSpeed manages distributed comms; DDP flags not needed
@@ -157,21 +154,12 @@ if int(os.environ.get("LOCAL_RANK", 0)) == 0:
             "deepspeed": DEEPSPEED_CONFIG,
         },
     )
-    mlflow.start_run()
-    mlflow.log_params({
-        "dataset_source": "HuggingFaceH4/deita-10k-v0-sft",
-        "dataset_split": "train_sft",
-        "dataset_size": len(dataset),
-        "dataset_seed": 42,
-        "model_id": MODEL_ID,
-    })
 
 # ALL ranks train
 trainer.train(resume_from_checkpoint=latest_checkpoint)
 
 if int(os.environ.get("LOCAL_RANK", 0)) == 0:
     print("Training complete!")
-    mlflow.end_run()
     wandb.finish()
 
 gc.collect()
