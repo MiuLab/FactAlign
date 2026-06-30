@@ -34,15 +34,17 @@ prompt_postamble = """\
 Provide as many specific details and examples as possible (such as names of \
 people, numbers, events, locations, dates, times, etc.)
 """
-openai_api_key = ''
+# Factiverse OpenAI key
+openai_api_key = '...'
 anthropic_api_key = ''
 serper_api_key = ''
-vllm_server_url = ''
+vllm_server_url = 'http://0.0.0.0:8000/v1'
 vllm_stop_token_ids = [107]
-colbert_server_url = ''
+colbert_server_url = 'http://127.0.0.1:8893/api/search'
 random_seed = 1
 model_options = {
     'gpt_4_turbo': 'OPENAI:gpt-4-0125-preview',
+    'gpt-3.5-turbo-1106': 'OPENAI:gpt-3.5-turbo-1106',
     'gpt_4': 'OPENAI:gpt-4-0613',
     'gpt_4o_mini': 'OPENAI:gpt-4o-mini',
     'gpt_4o_mini_0718': 'OPENAI:gpt-4o-mini-2024-07-18',
@@ -60,6 +62,16 @@ model_options = {
     'gemma_11_2b_it': 'vllm:google/gemma-1.1-2b-it',
     'gemma_2b_sft': 'vllm:Columbia-NLP/gemma-2b-zephyr-sft',
     'gemma_2b_sft_kto': 'vllm:../fact-align/experiments/kto',
+    'gemma_4_e4b_it': 'vllm:google/gemma-4-E4B-it',
+    'gpt_oss_120b': 'vllm:openai/gpt-oss-120b',
+    'gemma_4_31b': 'vllm:google/gemma-4-31B',
+    'gemma_4_26b_it': 'vllm:google/gemma-4-26B-A4B-it',
+    'llama_3_1_8b_it': 'vllm:meta-llama/Llama-3.1-8B-Instruct',
+    'gpt_oss_20b': 'vllm:openai/gpt-oss-20b',
+    'gemma-4-31B-it': 'vllm:google/gemma-4-31B-it',
+    'gemma-2b-zephyr-sft': 'vllm:Columbia-NLP/gemma-2b-zephyr-sft',
+    'gpt-5.2': 'mlflow:gpt-3.5-turbo',
+    'gemma-3-12b-it': 'vllm:google/gemma-3-12b-it',
 }
 model_string = {
     'gpt_4_turbo': 'gpt4turbo',
@@ -78,8 +90,21 @@ model_string = {
     'claude_instant': 'claudeinstant',
     'gemma_11_2b_it': 'gemma2bit',
     'gemma_2b_sft': 'gemma2bsft',
+    'gemma_4_e4b_it': 'gemma_4_e4b_it',
+    'gpt_oss_120b': 'gpt_oss_120b',
+    'gemma_4_31b': 'gemma_4_31b',
+    'gemma_4_26b_it': 'gemma_4_26b_it',
+    'llama_3_1_8b_it': 'llama_3_1_8b_it',
+    'gpt_oss_20b': 'gpt_oss_20b',
+    'gemma-4-31B-it': 'gemma-4-31B-it',
+    'gemma-2b-zephyr-sft': 'gemma-2b-zephyr-sft',
+    'gpt-5.2': 'gpt-5.2',
+    'gemma-3-12b-it': 'gemma-3-12b-it'
 }
+
 task_options = {}
 root_dir = '/'.join(os.path.abspath(__file__).split('/')[:-2])
 path_to_data = 'datasets/'
-path_to_result = 'results/'
+path_to_result = 'results/prompt_response/gemma-2b-it/prompt_v6'
+# path_to_result = 'results/prompt_response/gemma-2b-it-kto-v1/prompt_v6'
+

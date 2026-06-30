@@ -1,0 +1,46 @@
+[project]
+name = "fine-tuning"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10.20"
+dependencies = [
+    "accelerate==0.34.0",
+    "datasets==4.8.4",
+    "deepspeed==0.12.2",
+    "flash-attn==2.5.8",
+    "dotenv==0.9.9",
+    "huggingface-hub==0.36.2",
+    "jinja2==3.1.6",
+    "mlflow[genai]>=3.14.0",
+    "wandb>=0.17.0",
+    "numpy<2",                # torch 2.2.0 is built against NumPy 1.x
+    "pydantic==2.13.3",
+    "rich>=15.0.0",
+    "scikit-learn>=1.7.2",
+    "setuptools>=82.0.1",
+    "torch==2.2.0",
+    "tqdm==4.67.3",
+    "transformers==4.41.1",
+    "trl==0.9.6",
+]
+
+
+
+[dependency-groups]
+dev = [
+    "jupyterlab>=4.6.0",
+]
+
+# flash-attn's setup.py imports torch (and build tooling) at build time but
+# doesn't declare it, so uv's isolated build env can't see it. Inject torch into
+# the build env (pinned to the runtime torch 2.2.0 so the compiled CUDA extension
+# matches the torch ABI it's loaded against) plus the helpers setup.py needs.
+# Build isolation stays ON — this just populates the isolated build env.
+[tool.uv.extra-build-dependencies]
+flash-attn = [
+    "torch==2.2.0",
+    "setuptools",
+    "psutil",
+    "numpy<2",      # torch 2.2.0 was built against NumPy 1.x; NumPy 2.x crashes its import
+]

@@ -35,6 +35,11 @@ from common import shared_config
 from common import utils
 # pylint: enable=g-bad-import-order
 
+import base64
+from langfun.core.llms.openai import OpenAI as LfOpenAI
+import openai.api_requestor as _req
+import types
+
 _DEBUG_PRINT_LOCK = threading.Lock()
 _ANTHROPIC_MODELS = [
     'claude-3-opus-20240229',
@@ -189,8 +194,8 @@ class VllmModel(lf.LanguageModel):
   @functools.cached_property
   def _api_initialized(self):
     """No API key is required for vllm. Just set the base_url."""
-    openai.api_base = self.base_url
-    openai.api_key = "vllm"
+    # openai.api_base = self.base_url
+    # openai.api_key = "vllm"
     return True
 
   @property
@@ -242,6 +247,8 @@ class VllmModel(lf.LanguageModel):
       content = prompt.text
 
       response = openai.ChatCompletion.create(
+          api_base=self.base_url,
+          api_key="vllm",
           messages=[{'role': 'user', 'content': content}],
           **self._get_request_args(self.sampling_options),
       )
@@ -359,6 +366,40 @@ class VllmOfflineModel(lf.LanguageModel):
     return results
 
 
+def _patch_openai():
+  openai.api_base = os.environ["MLFLOW_AI_GATEWAY_URL"]
+  openai.api_key = os.environ['MLFLOW_AI_GATEWAY_PASSWORD']
+
+  mlflow_username = os.environ['MLFLOW_AI_GATEWAY_USERNAME']
+  mlflow_password = os.environ['MLFLOW_AI_GATEWAY_PASSWORD']
+
+  encoded_auth = base64.b64encode(f"{mlflow_username}:{mlflow_password}".encode()).decode()
+  
+  _original_request_headers = _req.APIRequestor.request_headers.__func__ \
+    if isinstance(_req.APIRequestor.request_headers, types.MethodType) \
+    else _req.APIRequestor.request_headers
+
+  def _patched_request_headers(self, method, extra, request_id):
+      headers = _original_request_headers(self, method, extra, request_id)
+      headers["Authorization"] = f"Basic {encoded_auth}"
+      return headers
+  
+  _req.APIRequestor.request_headers = _patched_request_headers
+
+  # Patch 2: rename max_tokens → max_completion_tokens
+  # Grab the original as an unbound function BEFORE replacing it
+  _original_get_request_args = LfOpenAI._get_request_args.__func__ \
+      if isinstance(LfOpenAI._get_request_args, types.MethodType) \
+      else LfOpenAI._get_request_args
+
+  def _patched_get_request_args(self, options):
+      args = _original_get_request_args(self, options)
+      if "max_tokens" in args:
+          args["max_completion_tokens"] = args.pop("max_tokens")
+      return args
+
+  LfOpenAI._get_request_args = _patched_get_request_args
+
 class Model:
   """Class for storing any single language model."""
 
@@ -386,6 +427,7 @@ class Model:
         temperature=temperature, max_tokens=max_tokens
     )
 
+
     if model_name.lower().startswith('openai:'):
       if not shared_config.openai_api_key:
         utils.maybe_print_error('No OpenAI API Key specified.')
@@ -394,6 +436,13 @@ class Model:
       return lf.llms.OpenAI(
           model=model_name[7:],
           api_key=shared_config.openai_api_key,
+          sampling_options=sampling,
+      )
+    elif model_name.lower().startswith('mlflow:'):
+      _patch_openai()
+      
+      return lf.llms.OpenAI(
+          model=model_name[7:],
           sampling_options=sampling,
       )
     elif model_name.lower().startswith('anthropic:'):

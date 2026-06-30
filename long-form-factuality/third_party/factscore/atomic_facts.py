@@ -53,19 +53,41 @@ MONTHS = [
 ]
 SPACY_MODEL = spacy.load('en_core_web_sm')
 DEMON_DIR = 'third_party/factscore/demos/'
-ATOMIC_FACT_INSTRUCTION = """\
-Instructions:
-1. You are given a sentence. Your task is to break the sentence down into a \
-list of atomic facts.
-2. An atomic fact is a sentence containing a singular piece of information.
-3. Each atomic fact in the outputted list should check a different piece of \
-information.
-4. Use the previous examples to learn how to do this.
-5. You should only output the atomic facts as a list, with each item starting \
-with "- ". Do not include other formatting.
-6. Your task is to do this for the last sentence that is given.
+ATOMIC_FACT_INSTRUCTION = """
+# Your role:
+You are given a sentence and its context (a pair of prompt and response where the sentence originates). Your task is to break the sentence down into a list of atomic facts. An atomic fact is a sentence containing a singular piece of information that specifies a fact and can be fact-checked against evidence from the real world. Each atomic fact in the outputted list should contain a different piece of information. The atomic fact should be well contexualized, i.e the extracted atomic fact should contain all the information it needs from its sourrounding to be understood without the original sourrounding sentences. Like pronouns should be replaced by person's actual name, title, organization, place, events, etc, and correct time, geographic region or additional necessary context should be added.
+
+# Your task:
+You are given a prompt, its response below.
+Prompt: "{prompt}"
+Response (delimited by ---):
+---
+{response}
+---
+
+Based on the prompt and response above, your task is to generate list of contextualized atomic facts from the input sentence below. Only output the atomic facts as a list, with each item starting with "- ". Do not include other formatting. Do not repeat atomic facts. Only include atomic facts that is literally part of the input sentence below, else refrain from including the fact. Return literal string "no atomic facts" if no atomic facts are found.
+
+Sentence: {sentence}
 """
 
+FILTER_REDUNDANT_FACTS_INSTRUCTION = """
+# Your role:
+You are an intelligent information extractor and fact checker. 
+
+# Your task:
+Your task is to filter out redundant atomic facts from a list of atomic facts, that are repetition of another fact, generalization of another fact, specialization of another fact or paraphrase of another fact.
+
+# Input:
+For the following atomic facts listed below, remove all the redundant facts.
+
+# Atomic Facts (itemized by -, delimited by ----): 
+---
+{atomic_facts}
+---
+
+# Output format:
+Only output the filtered list with each item should start with "- ". Do not include any other text apart from filtered atomic facts.
+"""
 
 class AtomicFactGenerator(object):
   """Atomic fact generator."""
@@ -93,17 +115,17 @@ class AtomicFactGenerator(object):
     tokenized_corpus = [doc.split(' ') for doc in self.demons.keys()]
     self.bm25 = rank_bm25.BM25Okapi(tokenized_corpus)
 
-  def run(self, generation: str, cost_estimate: Optional[bool] = None):
+  def run(self, prompt: str, generation: str, cost_estimate: Optional[bool] = None):
     """Convert the generation into a set of atomic facts."""
     assert isinstance(generation, str), 'generation must be a string'
     paragraphs = [
         para.strip() for para in generation.split('\n') if para.strip()
     ]
     return self.get_atomic_facts_from_paragraph(
-        paragraphs, cost_estimate=cost_estimate
+        prompt, paragraphs, cost_estimate=cost_estimate
     )
 
-  def get_atomic_facts_from_paragraph(self, paragraphs, cost_estimate=None):
+  def get_atomic_facts_from_paragraph(self, prompt, paragraphs, cost_estimate=None):
     """Get the atomic facts from the paragraphs."""
     sentences, para_breaks = [], []
 
@@ -125,6 +147,7 @@ class AtomicFactGenerator(object):
       sentences += curr_sentences
 
     atoms_or_estimate = self.get_init_atomic_facts_from_sentence(
+        prompt,
         [
             sent
             for i, sent in enumerate(sentences)
@@ -196,48 +219,22 @@ class AtomicFactGenerator(object):
 
     return atomic_facts_pairs, para_breaks
 
-  def get_init_atomic_facts_from_sentence(self, sentences, cost_estimate=None):
+  def get_init_atomic_facts_from_sentence(self, sentence_prompt, sentences, cost_estimate=None):
     """Get the initial atomic facts from the sentences."""
     is_bio, demons = self.is_bio, self.demons
     prompts, prompt_to_sent, atoms = [], {}, {}
     k = 1 if is_bio else 0
     n = 7 if is_bio else 8
 
+    response = "\n".join(sentences)
+
     for sentence in sentences:
       if sentence in atoms:
         continue
-
-      top_machings = best_demos(sentence, self.bm25, list(demons.keys()), k)
-      prompt = ''
-
-      for i in range(n):
-        prompt += (
-            'Please breakdown the following sentence into independent facts:'
-            ' {}\n'.format(list(demons.keys())[i])
-        )
-
-        for fact in demons[list(demons.keys())[i]]:
-          prompt += '- {}\n'.format(fact)
-
-        prompt += '\n'
-
-      for match in top_machings:
-        prompt += (
-            'Please breakdown the following sentence into independent facts:'
-            ' {}\n'.format(match)
-        )
-
-        for fact in demons[match]:
-          prompt += '- {}\n'.format(fact)
-
-        prompt += '\n'
-
-      # Add eval example
-      prompt += (
-          'Please breakdown the following sentence into independent facts:'
-          ' {}\n'.format(sentence)
+      
+      prompt = ATOMIC_FACT_INSTRUCTION.format(
+        prompt=sentence_prompt, response=response, sentence=sentence
       )
-
       prompts.append(prompt)
       prompt_to_sent[prompt] = sentence
 
@@ -251,8 +248,15 @@ class AtomicFactGenerator(object):
     else:
       for prompt in prompts:
         if self.other_lm is not None:
-          prompt_to_send = ATOMIC_FACT_INSTRUCTION + prompt  # add instructions
-          output = self.other_lm.generate(prompt_to_send, temperature=0)
+          atomic_facts = self.other_lm.generate(prompt, temperature=0)
+
+          if "no atomic facts" not in atomic_facts:
+            output = self.other_lm.generate(
+              FILTER_REDUNDANT_FACTS_INSTRUCTION.format(atomic_facts=atomic_facts),
+              temperature=0
+            )
+          else:
+            output = ""
         else:
           raise ValueError('other_lm is None')
 

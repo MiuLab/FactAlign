@@ -1,0 +1,30 @@
+{"prompt": "Who is Fran\u00e7ois Chollet?"}
+{"prompt": "Tell me about the EleutherAI Pile dataset."}
+{"prompt": "Tell me about the Open Neural Network Exchange (ONNX) format."}
+{"prompt": "Tell me about the company Hugging Face."}
+{"prompt": "Tell me about the Stanford Alpaca dataset."}
+{"prompt": "What happened during the NeurIPS 2020 Competition: Predicting Generalization in Deep Learning?"}
+{"prompt": "Tell me about the Allen Institute for AI\u2019s Semantic Scholar Open Research Corpus (S2ORC)."}
+{"prompt": "Tell me about the TensorFlow Model Garden repository."}
+{"prompt": "Tell me about the NVIDIA NeMo Guardrails toolkit."}
+{"prompt": "Tell me about the company Weights & Biases."}
+{"prompt": "Tell me about the Hugging Face MTEB (Massive Text Embedding Benchmark) leaderboard."}
+{"prompt": "Tell me about the Stanford DAWNBench benchmark suite."}
+{"prompt": "Tell me about the vLLM inference engine for large language models."}
+{"prompt": "Tell me about the Weights & Biases (wandb) Sweeps hyperparameter optimization service."}
+{"prompt": "Tell me about the Hugging Face `trl` library for reinforcement learning fine-tuning of language models."}
+{"prompt": "Tell me about the EleutherAI LM Evaluation Harness (lm-eval-harness) for benchmarking language models."}
+{"prompt": "Tell me about the LlamaIndex RAG evaluation harness (RAGAS integration) for benchmarking retrieval-augmented generation pipelines."}
+{"prompt": "Tell me about the MosaicML StreamingDataset library."}
+{"prompt": "Tell me about the NVIDIA TensorRT-LLM library for optimizing and serving large language models."}
+{"prompt": "Tell me about the EleutherAI Pythia suite of language models."}
+{"prompt": "Tell me about the BigScience BLOOM language model."}
+{"prompt": "Tell me about the MLPerf Inference benchmark."}
+{"prompt": "Tell me about the Berkeley DeepDrive (BDD100K) dataset."}
+{"prompt": "Tell me about the OpenAI Triton language and compiler for custom GPU kernels."}
+{"prompt": "Tell me about the OpenAI Triton language and compiler for writing custom GPU kernels."}
+{"prompt": "Who is Yaida Wang?"}
+{"prompt": "Tell me about the LAION-5B dataset."}
+{"prompt": "Tell me about the MLPerf Inference benchmark suite."}
+{"prompt": "What happened during the first NeurIPS competition on adversarial attacks and defenses?"}
+{"prompt": "Tell me about the Stanford Alpaca instruction-tuning dataset."}

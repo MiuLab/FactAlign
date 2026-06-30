@@ -1,0 +1,17 @@
+# ignore files
+.env
+.envrc
+*.log
+justfile
+notes.md
+
+
+# ignore list
+.venv/
+.vscode/
+logs/
+cache/
+wandb/
+results/
+notebooks/
+__pycache__/

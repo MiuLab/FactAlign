@@ -37,6 +37,9 @@ from data_creation import config as data_creation_config
 from data_creation import generate_data
 # pylint: enable=g-bad-import-order
 
+from dotenv import load_dotenv
+load_dotenv('../.env')
+
 _FORCE_OUTPUT_DIR = flags.DEFINE_string(
     name='force_output_dir',
     default=None,

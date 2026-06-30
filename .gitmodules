@@ -1,0 +1,15 @@
+[submodule "submodules/alignment-handbook"]
+	path = submodules/alignment-handbook
+	url = https://github.com/huggingface/alignment-handbook.git
+[submodule "submodules/factalign-gemma2-f1_0.75"]
+	path = submodules/factalign-gemma2-f1_0.75
+	url = https://huggingface.co/datasets/chaoweihuang/factalign-gemma2-f1_0.75
+[submodule "submodules/factalign-llama3-f1_0.8-fg0.5"]
+	path = submodules/factalign-llama3-f1_0.8-fg0.5
+	url = https://huggingface.co/datasets/chaoweihuang/factalign-llama3-f1_0.8-fg0.5
+[submodule "submodules/factalign-phi3-f1_0.7-fg0.5"]
+	path = submodules/factalign-phi3-f1_0.7-fg0.5
+	url = https://huggingface.co/datasets/chaoweihuang/factalign-phi3-f1_0.7-fg0.5
+[submodule "submodules/ultra-feedback"]
+	path = submodules/ultra-feedback
+	url = https://huggingface.co/datasets/openbmb/UltraFeedback

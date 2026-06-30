@@ -30,6 +30,7 @@ python -m eval.run_eval \
 import copy
 import datetime
 import os
+import sys
 import threading
 import time
 from typing import Any
@@ -47,6 +48,32 @@ from eval import metric_utils
 from eval.safe import config as safe_config
 from eval.safe import search_augmented_factuality_eval as safe
 # pylint: enable=g-bad-import-order
+
+from dotenv import load_dotenv
+load_dotenv('../.env')
+
+from loguru import logger
+
+logger.remove()
+
+# logger.add(
+#   sys.stderr,
+#   format="<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>",
+#   level="DEBUG"
+# )
+
+timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+log_filename = f"logs/{safe_config.claim_extraction_model}_run_eval_{timestamp}.log"
+
+print("{'Init Logging':=^100}")
+print(f"Logging to file: {log_filename}")
+
+logger.add(
+    log_filename,
+    format="{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} | {name}:{function}:{line} - {message}",
+    level="DEBUG",
+    encoding="utf-8"
+)
 
 _RESULT_PATH = flags.DEFINE_string(
     'result_path', '', 'Path to the result file to eval.'
@@ -87,9 +114,9 @@ _F1 = 'f1'
 EVAL_KEY = 'posthoc_eval_data'
 SIDE_TO_SIDE_STR = {_SIDE1: 'side_1', _SIDE2: 'side_2'}
 
-
 def add_rating(
     prompt_result: dict[str, str | list[str] | dict[str, Any]],
+    claim_extraction_model: modeling.Model,
     rater_model: modeling.Model,
     eval_side1: bool,
     eval_side2: bool,
@@ -104,6 +131,7 @@ def add_rating(
       prompt_result_rated[eval_side_key] = safe.main(
           prompt=prompt_result_rated[_PROMPT],
           response=prompt_result_rated[f'{side}_response'],
+          claim_extraction_model=claim_extraction_model,
           rater=rater_model,
       )
 
@@ -112,6 +140,7 @@ def add_rating(
 
 def evaluate_data(
     result_data: dict[str, Any],
+    claim_extraction_model: modeling.Model,
     rater_model: modeling.Model,
     do_side1: bool,
     do_side2: bool,
@@ -126,6 +155,7 @@ def evaluate_data(
     single_prompt_result = single_prompt_result_and_index[0]
     return add_rating(
         prompt_result=single_prompt_result,
+        claim_extraction_model=claim_extraction_model,
         rater_model=rater_model,
         eval_side1=do_side1,
         eval_side2=do_side2,
@@ -230,6 +260,12 @@ def main(_) -> None:
         shard_idx=_SHARD_IDX.value,
     )
 
+  claim_extraction_model = modeling.Model(
+      shared_config.model_options[safe_config.claim_extraction_model],
+      temperature=safe_config.claim_extraction_model_temp,
+      max_tokens=safe_config.claim_extraction_max_tokens,
+  )
+
   model_short = _MODEL_SHORT.value or safe_config.model_short
   model = shared_config.model_options[model_short]
   rater_model = modeling.Model(
@@ -245,6 +281,7 @@ def main(_) -> None:
   utils.print_info(f'Evaluating {len(result_data[_PER_PROMPT_DATA])} prompts.')
   evaluate_data(
       result_data=result_data,
+      claim_extraction_model=claim_extraction_model,
       rater_model=rater_model,
       do_side1=do_side1,
       do_side2=do_side2,

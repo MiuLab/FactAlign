@@ -34,8 +34,12 @@ from common import shared_config
 #     'claude_instant',
 # ]
 ################################################################################
-model_short = 'gpt_35_turbo'
-model_temp = 0.1
+claim_extraction_model = 'gpt-5.2'
+claim_extraction_model_temp = 0
+claim_extraction_max_tokens = 1024
+
+model_short = 'gpt-5.2'
+model_temp = 0
 max_tokens = 512
 
 ################################################################################
@@ -53,8 +57,8 @@ num_searches = 3
 # max_retries: int = maximum number of retries when fact checking fails.
 # debug_safe: bool = show debugging printouts when running SAFE.
 ################################################################################
-max_steps = 2
-max_retries = 3
+max_steps = 1
+max_retries = 3 # fetch final answ
 do_check_relevance = True
 use_short_prompt = True
 debug_safe = True

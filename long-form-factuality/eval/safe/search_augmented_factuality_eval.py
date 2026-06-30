@@ -25,11 +25,13 @@ from eval.safe import get_atomic_facts
 from eval.safe import rate_atomic_fact
 # pylint: enable=g-bad-import-order
 
+from loguru import logger
+
 IRRELEVANT_LABEL = 'Irrelevant'
 SUPPORTED_LABEL = rate_atomic_fact.SUPPORTED_LABEL
 NOT_SUPPORTED_LABEL = rate_atomic_fact.NOT_SUPPORTED_LABEL
 
-_MAX_PIPELINE_RETRIES = 3
+_MAX_PIPELINE_RETRIES = 2
 
 
 class CheckedStatement:
@@ -114,7 +116,7 @@ def classify_relevance_and_rate_single(
     return checked_statement, revised_fact_dict, {}
 
   rate_data, past_steps_dict = rate_atomic_fact.check_atomic_fact(
-      atomic_fact=self_contained_atomic_fact, rater=rater
+      atomic_fact=atomic_fact, rater=rater
   )
 
   if not isinstance(rate_data, rate_atomic_fact.FinalAnswer):
@@ -170,6 +172,7 @@ def classify_relevance_and_rate(
         checked_statements.append(checked_statement)
         revised_fact_dicts.append(revised_fact_dict)
         past_steps_dicts.append(past_steps_dict)
+    
 
   return {
       'checked_statements': [item.data for item in checked_statements],
@@ -179,14 +182,36 @@ def classify_relevance_and_rate(
   }
 
 
-def main(prompt: str, response: str, rater: modeling.Model) -> dict[str, Any]:
-  atomic_facts = get_atomic_facts.main(response=response, model=rater)
+def main(prompt: str, response: str, claim_extraction_model: modeling.Model, rater: modeling.Model) -> dict[str, Any]:
+
+  logger.debug(f"{'Prompt':=^100}")
+  logger.opt(colors=True).debug(f"<green>{prompt}</green>")
+
+  logger.debug(f"{'Response':=^100}")
+  logger.opt(colors=True).debug(f"<green>{response}</green>")
+
+  atomic_facts = get_atomic_facts.main(prompt=prompt, response=response, 
+  model=claim_extraction_model)
+
+  if atomic_facts['all_atomic_facts']:
+    total_atomic_facts = sum([len(el['atomic_facts']) for el in atomic_facts['all_atomic_facts']])
+
+    logger.opt(colors=True).debug(f"Number of sentences: <yellow>{len(atomic_facts['all_atomic_facts'])}</yellow>")
+    logger.opt(colors=True).debug(f"Number of atomic facts: <yellow>{total_atomic_facts}</yellow>")
+
+    for el in atomic_facts['all_atomic_facts']:
+      logger.opt(colors=True).debug(f"<green>{el['sentence']}</green>")
+
+      for af in el['atomic_facts']:
+        logger.opt(colors=True).debug(f"\t<blue>{af}</blue>")
+
   rating_result = classify_relevance_and_rate(
       prompt=prompt,
       response=response,
       sentences_and_atomic_facts=atomic_facts['all_atomic_facts'],
       rater=rater,
   )
+
   return {
       'prompt': prompt, 'response': response, **atomic_facts, **rating_result
   }
