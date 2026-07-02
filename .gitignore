@@ -13,5 +13,4 @@ logs/
 cache/
 wandb/
 results/
-notebooks/
 __pycache__/

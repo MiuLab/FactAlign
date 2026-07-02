@@ -6,5 +6,6 @@ readme = "README.md"
 requires-python = ">=3.10.20"
 dependencies = [
     "mlflow[genai]>=3.14.0",
+    "notebook>=7.6.0",
     "vllm==0.18.0",
 ]
