@@ -15,7 +15,7 @@ gen_response:
 
 run_eval:
     PYTHONPATH=/home/pratuat/repositories/FactAlign/long-form-factuality python -m eval.run_eval \
-        --result_path='results/prompt_response/gemma-2b-it-kto-v1/prompt_v7_2p/2026-06-22-09-35-36.json' \
+        --result_path='results/evals/gemma-2b-sft-v2-2026-06-30-13-20-03.json' \
         --eval_side2=False \
         --parallelize=True
 

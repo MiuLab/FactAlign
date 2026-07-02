@@ -50,7 +50,7 @@ from eval.safe import search_augmented_factuality_eval as safe
 # pylint: enable=g-bad-import-order
 
 from dotenv import load_dotenv
-load_dotenv('../.env')
+load_dotenv('.env')
 
 from loguru import logger
 
@@ -168,7 +168,7 @@ def evaluate_data(
     for prompt_data_and_index, result, error in lf.concurrent_map(
         add_rating_wrapped,
         [(item, i) for i, item in enumerate(result_data[_PER_PROMPT_DATA])],
-        max_workers=32,
+        max_workers=20,
         show_progress=show_progress_bar,
     ):
       if error or not result:

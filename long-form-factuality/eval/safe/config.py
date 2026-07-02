@@ -34,11 +34,11 @@ from common import shared_config
 #     'claude_instant',
 # ]
 ################################################################################
-claim_extraction_model = 'gpt-5.2'
+claim_extraction_model = 'uis-claim-extractor'
 claim_extraction_model_temp = 0
 claim_extraction_max_tokens = 1024
 
-model_short = 'gpt-5.2'
+model_short = 'uis-claim-extractor'
 model_temp = 0
 max_tokens = 512
 

@@ -54,23 +54,37 @@ MONTHS = [
 SPACY_MODEL = spacy.load('en_core_web_sm')
 DEMON_DIR = 'third_party/factscore/demos/'
 ATOMIC_FACT_INSTRUCTION = """
+
+[ATOMIC FACT EXTRACTOR : {prompt}]
+
 # Your role:
-You are given a sentence and its context (a pair of prompt and response where the sentence originates). Your task is to break the sentence down into a list of atomic facts. An atomic fact is a sentence containing a singular piece of information that specifies a fact and can be fact-checked against evidence from the real world. Each atomic fact in the outputted list should contain a different piece of information. The atomic fact should be well contexualized, i.e the extracted atomic fact should contain all the information it needs from its sourrounding to be understood without the original sourrounding sentences. Like pronouns should be replaced by person's actual name, title, organization, place, events, etc, and correct time, geographic region or additional necessary context should be added.
+You are given a SENTENCE and its CONTEXT (CONTEXT includes a PROMPT and its RESPONSE where the SENTENCE originates). Your task is to break the SENTENCE down into a list of atomic facts. An atomic fact is a statement containing a singular piece of information that specifies a fact and can be fact-checked against evidence from the real world. Each atomic fact in the output list should contain a different piece of information. The atomic fact should be well contexualized, i.e the extracted atomic fact should contain all the information it needs from its sourrounding to be understood without the original sourrounding text. Like pronouns should be replaced by person's actual name, title, organization, place, events, etc, and correct time, geographic region or additional necessary context should be added.
 
 # Your task:
-You are given a prompt, its response below.
-Prompt: "{prompt}"
-Response (delimited by ---):
----
+
+Inputs:
+
+```
+# PROMPT
+{prompt}
+```
+
+```
+# RESPONSE
 {response}
----
+```
 
-Based on the prompt and response above, your task is to generate list of contextualized atomic facts from the input sentence below. Only output the atomic facts as a list, with each item starting with "- ". Do not include other formatting. Do not repeat atomic facts. Only include atomic facts that is literally part of the input sentence below, else refrain from including the fact. Return literal string "no atomic facts" if no atomic facts are found.
+```
+# SENTENCE
+{sentence}
+```
 
-Sentence: {sentence}
+Based on the PROMPT and RESPONSE above, your task is to generate list of contextualized atomic facts from the input SENTENCE. Only output the atomic facts as a list, with each item starting with "- ". Do not include other formatting. Do not repeat atomic facts. Only include atomic facts that is literally part of the input sentence below, else refrain from including the fact. Return literal string "no atomic facts" if no atomic facts are found.
 """
 
 FILTER_REDUNDANT_FACTS_INSTRUCTION = """
+[ATOMIC FACT FILTER]
+
 # Your role:
 You are an intelligent information extractor and fact checker. 
 
@@ -80,13 +94,13 @@ Your task is to filter out redundant atomic facts from a list of atomic facts, t
 # Input:
 For the following atomic facts listed below, remove all the redundant facts.
 
-# Atomic Facts (itemized by -, delimited by ----): 
----
+```
+# Atomic facts
 {atomic_facts}
----
+```
 
 # Output format:
-Only output the filtered list with each item should start with "- ". Do not include any other text apart from filtered atomic facts.
+Only output the filtered list. Each item should start with "- ". Do not include any other text apart from filtered atomic facts.
 """
 
 class AtomicFactGenerator(object):

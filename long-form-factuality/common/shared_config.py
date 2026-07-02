@@ -60,6 +60,8 @@ model_options = {
     'claude_20': 'ANTHROPIC:claude-2.0',
     'claude_instant': 'ANTHROPIC:claude-instant-1.2',
     'gemma-2b-sft': 'vllm:results/models/gemma-2b/fine-tuned/v2/final_merged',
+    'uis-claim-extractor': 'mlflow:gpt-3.5-turbo',
+    'uis-claim-verifier': 'mlflow:gpt-4', # meta-llama/Llama-3.1-8B-Instruct
 }
 model_string = {
     'gpt_4_turbo': 'gpt4turbo',

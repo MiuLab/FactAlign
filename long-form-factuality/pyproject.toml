@@ -1,5 +1,5 @@
 [project]
-name = "safe"
+name = "lff"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -7,7 +7,11 @@ requires-python = "==3.10.20"
 dependencies = [
     "absl-py==2.1.0",
     "anthropic==0.16.0",
+    "duckduckgo-search>=8.1.1",
     "langfun==0.0.2.dev20240202",
+    "loguru>=0.7.3",
+    "nltk==3.8.1",
     "openai==0.27.2",
+    "rank-bm25==0.2.2",
     "vllm==0.3.3",
 ]

@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Identifies whether an atomic fact is relevant for ansing the prompt."""
+"""Identifies whether an atomic fact is relevant for answering the prompt."""
 
 from typing import Any
 
@@ -29,6 +29,8 @@ _RESPONSE_PLACEHOLDER = '[RESPONSE]'
 _STATEMENT_PLACEHOLDER = '[ATOMIC FACT]'
 
 _RELEVANCE_FORMAT = f"""\
+[RELEVANCE JUDGE]
+
 In a given RESPONSE, two subjects are considered "{SYMBOL}" if the RESPONSE \
 contains information that explains how the two subjects are related.
 
@@ -103,6 +105,8 @@ STATEMENT:
 {_STATEMENT_PLACEHOLDER}
 """
 _REVISE_FORMAT = f"""\
+[REVISE STATEMENT]
+
 Vague references include but are not limited to:
 - Pronouns (e.g., "his", "they", "her")
 - Unknown entities (e.g., "this event", "the research", "the invention")
