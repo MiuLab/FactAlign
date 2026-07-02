@@ -23,6 +23,8 @@ from data_creation import examples
 # pylint: enable=g-bad-import-order
 
 _PREAMBLE_CONCEPTS = f"""\
+[PROMPT GENERATION: CONCEPTS]
+
 Instructions:
 1. Ask a general question about a concept.
 2. IMPORTANT: DO NOT ask about an object (such as a person, place, or event,\
@@ -36,12 +38,15 @@ specific details such as numbers, names, dates, etc.
 6. Follow the question styles in the provided examples.
 7. Wrap the question in square brackets.
 """
+
 _PREAMBLE_OBJECTS = f"""\
+[PROMPT GENERATION: OBJECTS]
+
 Instructions:
 1. Ask a general question about a specific object (such as a person, place, \
 event, act, company etc.).
-2. The object should be very specific and niche within the topic of \
-{examples.PLACEHOLDERS.topic}.
+2. The object should be very specific and very popular within the topic of \
+{examples.PLACEHOLDERS.topic} and accurately documented in the internet.
 3. IMPORTANT: DO NOT ASK ABOUT A CONCEPT (such as doctrines, theories, ideas, \
 methods, principles, etc.).
 4. Do not ask about any particular aspect of the object (such as history, \
@@ -49,6 +54,7 @@ significance, impact, role, purpose, etc.).
 5. Follow the question styles in the provided examples.
 6. Wrap the question in square brackets.
 """
+
 _PREAMBLE_OBJECTS_MORAL_DISPUTES = f"""\
 Instructions:
 1. Ask a general question about a specific object (such as a person, place, \

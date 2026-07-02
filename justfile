@@ -15,7 +15,7 @@ gen_response:
 
 run_eval:
     PYTHONPATH=/home/pratuat/repositories/FactAlign/long-form-factuality python -m eval.run_eval \
-        --result_path='results/evals/gemma-2b-sft-v2-2026-06-30-13-20-03.json' \
+        --result_path='results/evals/gemma-2b-sft-v2-2026-07-02-04-38-09-v15.json' \
         --eval_side2=False \
         --parallelize=True
 
@@ -33,3 +33,17 @@ vllm_llama:
 
 slurm-fine-tune:
     cd fine-tuning && sbatch slurm/slurm_fine_tune.sh
+
+
+long-form-factuality/results/evals/gemma-2b-sft-v2-2026-07-02-04-38-09-v15.json
+
+
+PYTHONPATH=. python -m eval.run_eval \
+    --result_path='results/evals/gemma-2b-sft-v2-2026-07-02-04-38-09-v15.json' \
+    --eval_side2=False \
+    --parallelize=True
+
+PYTHONPATH=. python -m eval.run_eval \
+    --result_path='results/evals/gemma-2b-kto-v2-it_1-2026-07-02-05-01-38-v15.json' \
+    --eval_side2=False \
+    --parallelize=True

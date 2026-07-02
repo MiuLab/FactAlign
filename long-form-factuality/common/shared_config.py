@@ -59,9 +59,11 @@ model_options = {
     'claude_21': 'ANTHROPIC:claude-2.1',
     'claude_20': 'ANTHROPIC:claude-2.0',
     'claude_instant': 'ANTHROPIC:claude-instant-1.2',
-    'gemma-2b-sft': 'vllm:results/models/gemma-2b/fine-tuned/v2/final_merged',
+    'gemma-2b-sft': 'vllm:results/models/gemma-2b/sft/v2/final_merged',
+    'gemma-2b-kto': 'vllm:results/models/gemma-2b/kto/v2-it_1',
     'uis-claim-extractor': 'mlflow:gpt-3.5-turbo',
     'uis-claim-verifier': 'mlflow:gpt-4', # meta-llama/Llama-3.1-8B-Instruct
+    'gemma-2b-it': 'mlflow:gpt-4', # meta-llama/Llama-3.1-8B-Instruct
 }
 model_string = {
     'gpt_4_turbo': 'gpt4turbo',
@@ -78,16 +80,8 @@ model_string = {
     'claude_21': 'claude21',
     'claude_20': 'claude20',
     'claude_instant': 'claudeinstant',
-    'gemma_11_2b_it': 'gemma2bit',
-    'gemma_2b_sft': 'gemma2bsft',
-    'gemma_4_e4b_it': 'gemma_4_e4b_it',
-    'gpt_oss_120b': 'gpt_oss_120b',
-    'gemma_4_31b': 'gemma_4_31b',
-    'gemma_4_26b_it': 'gemma_4_26b_it',
-    'llama_3_1_8b_it': 'llama_3_1_8b_it',
-    'gpt_oss_20b': 'gpt_oss_20b',
-    'gemma-4-31B-it': 'gemma-4-31B-it',
-    'gemma-2b-sft': 'gemma-2b-sft',
+    'gemma-2b-it': 'gemma2bit',
+    'uis-claim-extractor': 'gpt35turbo',
 }
 
 task_options = {}

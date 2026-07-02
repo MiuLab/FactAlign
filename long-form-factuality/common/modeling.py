@@ -486,7 +486,7 @@ class Model:
       max_tokens: Optional[int] = None,
       max_attempts: int = 5,
       timeout: int = 60,
-      retry_interval: int = 10,
+      retry_interval: int = 3,
   ) -> str:
     """Generates a response to a prompt."""
     self.model.max_attempts = 1

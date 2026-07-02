@@ -78,7 +78,7 @@ show_responder_responses = True
 # Old LongFact versions can be used by setting `task` to their directory.
 ################################################################################
 # task_short = 'longfact/object_sampled/'
-task_short = 'datasets/longfact-objects_gpt-5.2_v7_2p/' # 30 * 38 prompts
+task_short = 'datasets/longfact-objects_gemma2bit_v14_2p/' # 30 * 38 prompts
 shuffle_data = False
 max_num_examples = -1
 add_universal_postamble = True
@@ -105,10 +105,15 @@ response_length_postamble = (
 # responder_model = shared_config.model_options[responder_model_short]
 # responder_model = "vllm:google/gemma-2b-it"
 # responder_model = "vllm:results/models/gemma-2b/fine-tuned/v2/final_merged"
-responder_model = "vllm:google/gemma-2b"
+# responder_model = "vllm:results/models/gemma-2b/sft/v2/final_merged"
+responder_model = "vllm:results/models/gemma-2b/kto/v2-it_1"
 
 task = (
     shared_config.task_options[task_short]
     if task_short in shared_config.task_options
     else task_short
 )
+
+
+# command to run
+# PYTHONPATH=. python -m main.pipeline

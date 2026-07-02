@@ -33,7 +33,7 @@ from common import shared_config
 #     'claude_instant',
 # ]
 ################################################################################
-generator_model = 'gpt-5.2'
+generator_model = 'uis-claim-extractor'
 generation_temp = 1.0
 
 ################################################################################
@@ -47,7 +47,7 @@ generation_temp = 1.0
 # save_results: bool = whether to save results.
 ################################################################################
 subtask = 'longfact_objects'
-num_prompts_to_generate = 5
+num_prompts_to_generate = 2
 max_in_context_examples = 10
 save_results = True
 
@@ -68,3 +68,7 @@ show_generator_responses = True
 ################################################################################
 generator_shorthand = shared_config.model_string[generator_model]
 generator = shared_config.model_options[generator_model]
+
+
+# command to run
+# PYTHONPATH=. python -m data_creation.pipeline
